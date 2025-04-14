@@ -18,6 +18,10 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private Integer id;
 
+    @ManyToOne
+    @JoinColumn(name = "idRol", nullable = false)
+    private Role role;
+
     @Column(nullable = false)
     private String fullName;
 
@@ -41,6 +45,14 @@ public class User implements UserDetails {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 
     public String getFullName() {

@@ -2,6 +2,7 @@ package com.spring.spring_booking_system.controllers;
 
 import com.spring.spring_booking_system.dtos.LoginUserDto;
 import com.spring.spring_booking_system.dtos.RegisterUserDto;
+import com.spring.spring_booking_system.dtos.UserResponseDto;
 import com.spring.spring_booking_system.entities.User;
 import com.spring.spring_booking_system.responses.LoginResponse;
 import com.spring.spring_booking_system.services.AuthenticationService;
@@ -27,10 +28,9 @@ public class AuthenticationController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<User> signup(@RequestBody RegisterUserDto registerUserDto) {
+    public ResponseEntity<UserResponseDto> signup(@RequestBody RegisterUserDto registerUserDto) {
         User registeredUser = authenticationService.signup(registerUserDto);
-
-        return ResponseEntity.ok(registeredUser);
+        return ResponseEntity.ok(new UserResponseDto(registeredUser));
     }
 
     @PostMapping("/login")
