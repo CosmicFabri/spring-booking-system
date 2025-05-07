@@ -4,7 +4,9 @@ import com.spring.spring_booking_system.dtos.LoginUserDto;
 import com.spring.spring_booking_system.dtos.RegisterUserDto;
 import com.spring.spring_booking_system.dtos.UserResponseDto;
 import com.spring.spring_booking_system.entities.User;
+import com.spring.spring_booking_system.exceptions.RoleNotFoundException;
 import com.spring.spring_booking_system.responses.LoginResponse;
+import com.spring.spring_booking_system.responses.ErrorResponse;
 import com.spring.spring_booking_system.services.AuthenticationService;
 import com.spring.spring_booking_system.services.JwtService;
 import org.springframework.http.HttpStatus;
@@ -30,12 +32,16 @@ public class AuthenticationController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<UserResponseDto> signup(@RequestBody RegisterUserDto registerUserDto) {
+    public ResponseEntity<?> signup(@RequestBody RegisterUserDto registerUserDto) {
         try {
             User registeredUser = authenticationService.signup(registerUserDto);
             return ResponseEntity.ok(new UserResponseDto(registeredUser));
+        } catch (RoleNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse("Role not found"));
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(e.getMessage()));
         }
     }
 
@@ -44,7 +50,7 @@ public class AuthenticationController {
         try {
             User loggedUser = authenticationService.authenticate(loginUserDto);
 
-            String jwtToken =  jwtService.generateToken(loggedUser);
+            String jwtToken = jwtService.generateToken(loggedUser);
 
             LoginResponse loginResponse = new LoginResponse();
 

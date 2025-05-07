@@ -6,6 +6,7 @@ import com.spring.spring_booking_system.entities.Role;
 import com.spring.spring_booking_system.entities.User;
 import com.spring.spring_booking_system.repositories.RoleRepository;
 import com.spring.spring_booking_system.repositories.UserRepository;
+import com.spring.spring_booking_system.exceptions.RoleNotFoundException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,7 +35,7 @@ public class AuthenticationService {
         User user = new User();
 
         Role role = roleRepository.findById(input.getRoleId())
-                .orElseThrow(() -> new RuntimeException("Role not found"));
+                .orElseThrow(() -> new RoleNotFoundException(input.getRoleId()));
 
         user.setRole(role);
         System.out.println(role);
