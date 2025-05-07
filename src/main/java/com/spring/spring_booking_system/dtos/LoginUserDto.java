@@ -2,7 +2,6 @@ package com.spring.spring_booking_system.dtos;
 
 public class LoginUserDto {
     private String email;
-
     private String password;
 
     public String getEmail() {
