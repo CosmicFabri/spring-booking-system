@@ -7,7 +7,9 @@ import com.spring.spring_booking_system.entities.User;
 import com.spring.spring_booking_system.responses.LoginResponse;
 import com.spring.spring_booking_system.services.AuthenticationService;
 import com.spring.spring_booking_system.services.JwtService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,21 +31,29 @@ public class AuthenticationController {
 
     @PostMapping("/signup")
     public ResponseEntity<UserResponseDto> signup(@RequestBody RegisterUserDto registerUserDto) {
-        User registeredUser = authenticationService.signup(registerUserDto);
-        return ResponseEntity.ok(new UserResponseDto(registeredUser));
+        try {
+            User registeredUser = authenticationService.signup(registerUserDto);
+            return ResponseEntity.ok(new UserResponseDto(registeredUser));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginUserDto loginUserDto) {
-        User loggedUser = authenticationService.authenticate(loginUserDto);
+        try {
+            User loggedUser = authenticationService.authenticate(loginUserDto);
 
-        String jwtToken =  jwtService.generateToken(loggedUser);
+            String jwtToken =  jwtService.generateToken(loggedUser);
 
-        LoginResponse loginResponse = new LoginResponse();
+            LoginResponse loginResponse = new LoginResponse();
 
-        loginResponse.setToken(jwtToken);
-        loginResponse.setExpiresIn(jwtService.getExpirationTime());
+            loginResponse.setToken(jwtToken);
+            loginResponse.setExpiresIn(jwtService.getExpirationTime());
 
-        return ResponseEntity.ok(loginResponse);
+            return ResponseEntity.ok(loginResponse);
+        } catch (BadCredentialsException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 }
