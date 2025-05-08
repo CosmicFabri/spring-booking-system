@@ -25,7 +25,7 @@ public class User implements UserDetails {
     @JoinColumn(name = "idRol", nullable = false)
     private Role role;
 
-    @Column(nullable = false)
+    @Column(unique = true, nullable = false)
     private String fullName;
 
     @Column(unique = true, length = 100, nullable = false)
