@@ -17,6 +17,9 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.NoHandlerFoundException;
+import com.spring.spring_booking_system.exceptions.RoleNotFoundException;
+import com.spring.spring_booking_system.responses.*;
+import org.springframework.security.authentication.BadCredentialsException;
 
 import java.util.List;
 
@@ -68,13 +71,5 @@ public class SecurityConfiguration {
         source.registerCorsConfiguration("/**",configuration);
 
         return source;
-    }
-
-    @ControllerAdvice
-    public static class GlobalExceptionHandler {
-        @ExceptionHandler(NoHandlerFoundException.class)
-        public ResponseEntity<String> handleNotFound(NoHandlerFoundException ex) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Route not found");
-        }
     }
 }
