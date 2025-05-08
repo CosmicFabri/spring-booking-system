@@ -9,10 +9,12 @@ import com.spring.spring_booking_system.responses.LoginResponse;
 import com.spring.spring_booking_system.responses.ErrorResponse;
 import com.spring.spring_booking_system.services.AuthenticationService;
 import com.spring.spring_booking_system.services.JwtService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,26 +34,21 @@ public class AuthenticationController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(@RequestBody RegisterUserDto registerUserDto) {
+    public ResponseEntity<?> signup(@Valid @RequestBody RegisterUserDto registerUserDto) {
         try {
             User registeredUser = authenticationService.signup(registerUserDto);
             return ResponseEntity.ok(new UserResponseDto(registeredUser));
         } catch (RoleNotFoundException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ErrorResponse("Role not found"));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ErrorResponse(e.getMessage()));
         }
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginUserDto loginUserDto) {
+    public ResponseEntity<?> login(@Valid @RequestBody LoginUserDto loginUserDto) {
         try {
             User loggedUser = authenticationService.authenticate(loginUserDto);
-
             String jwtToken = jwtService.generateToken(loggedUser);
-
             LoginResponse loginResponse = new LoginResponse();
 
             loginResponse.setToken(jwtToken);
@@ -59,7 +56,8 @@ public class AuthenticationController {
 
             return ResponseEntity.ok(loginResponse);
         } catch (BadCredentialsException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse("Fill all the fields."));
         }
     }
 }

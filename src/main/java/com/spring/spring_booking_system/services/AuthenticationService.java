@@ -38,7 +38,6 @@ public class AuthenticationService {
                 .orElseThrow(() -> new RoleNotFoundException(input.getRoleId()));
 
         user.setRole(role);
-        System.out.println(role);
         user.setFullName(input.getFullName());
         user.setEmail(input.getEmail());
         user.setPassword(passwordEncoder.encode(input.getPassword()));
