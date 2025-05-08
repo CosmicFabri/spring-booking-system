@@ -13,8 +13,12 @@ public class SpringBookingSystemApplication {
 		System.setProperty("JDBC_DATABASE_URL", dotenv.get("DB_URL"));
 		System.setProperty("JDBC_DATABASE_USERNAME", dotenv.get("DB_USERNAME"));
 		System.setProperty("JDBC_DATABASE_PASSWORD", dotenv.get("DB_PASSWORD"));
+
 		System.setProperty("JWT_SECRET_KEY", dotenv.get("JWT_SECRET"));
 		System.setProperty("JWT_EXPIRATION_TIME", dotenv.get("JWT_EXPIRATION"));
+
+		System.setProperty("MAIL_USERNAME", dotenv.get("MAIL_USERNAME"));
+		System.setProperty("MAIL_PASSWORD", dotenv.get("MAIL_PASSWORD"));
 
 		SpringApplication.run(SpringBookingSystemApplication.class, args);
 	}
