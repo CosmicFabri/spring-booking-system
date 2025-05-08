@@ -2,6 +2,7 @@ package com.spring.spring_booking_system.configs;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -46,6 +47,7 @@ public class SecurityConfiguration {
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
                     .requestMatchers("/auth/**").permitAll()
+                    .requestMatchers("/spaces/**").permitAll()
                     .requestMatchers(userRoutes).authenticated()
                     .anyRequest().permitAll()
             )
