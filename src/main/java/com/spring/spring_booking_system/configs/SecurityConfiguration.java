@@ -72,30 +72,4 @@ public class SecurityConfiguration {
 
         return source;
     }
-
-    @ControllerAdvice
-    public static class GlobalExceptionHandler {
-        @ExceptionHandler(NoHandlerFoundException.class)
-        public ResponseEntity<String> handleNotFound(NoHandlerFoundException ex) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Route not found");
-        }
-
-        @ExceptionHandler(RoleNotFoundException.class)
-        public ResponseEntity<ErrorResponse> handleRoleNotFound(RoleNotFoundException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ErrorResponse("Role not found"));
-        }
-
-        @ExceptionHandler(IllegalArgumentException.class)
-        public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ErrorResponse(ex.getMessage()));
-        }
-
-        @ExceptionHandler(BadCredentialsException.class)
-        public ResponseEntity<ErrorResponse> handleBadCredentials(BadCredentialsException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ErrorResponse("Wrong credentials"));
-        }
-    }
 }

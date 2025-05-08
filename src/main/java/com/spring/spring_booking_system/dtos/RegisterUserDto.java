@@ -1,6 +1,7 @@
 package com.spring.spring_booking_system.dtos;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -14,6 +15,7 @@ public class RegisterUserDto {
     private Long roleId;
 
     @NotBlank(message = "Email is mandatory.")
+    @Email(message = "Email must be valid")
     private String email;
 
     @NotBlank(message = "Password is mandatory.")
