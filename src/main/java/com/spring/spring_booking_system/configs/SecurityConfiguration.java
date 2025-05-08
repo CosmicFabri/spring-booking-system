@@ -19,6 +19,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import com.spring.spring_booking_system.exceptions.RoleNotFoundException;
 import com.spring.spring_booking_system.responses.*;
+import org.springframework.security.authentication.BadCredentialsException;
 
 import java.util.List;
 
@@ -89,6 +90,12 @@ public class SecurityConfiguration {
         public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ErrorResponse(ex.getMessage()));
+        }
+
+        @ExceptionHandler(BadCredentialsException.class)
+        public ResponseEntity<ErrorResponse> handleBadCredentials(BadCredentialsException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse("Wrong credentials"));
         }
     }
 }
