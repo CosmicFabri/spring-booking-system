@@ -40,6 +40,7 @@ public class SecurityConfiguration {
             .authorizeHttpRequests(auth -> auth
                     .requestMatchers("/auth/**").permitAll()
                     .requestMatchers("/spaces/**").authenticated()
+                    .requestMatchers("/bookings/**").authenticated()
                     .requestMatchers(userRoutes).authenticated()
                     .anyRequest().permitAll()
             )
