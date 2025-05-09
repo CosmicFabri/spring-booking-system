@@ -30,7 +30,7 @@ public class SpaceController {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('admin')")
-    public ResponseEntity<Space> getSpaceById(@PathVariable int id) {
+    public ResponseEntity<Space> getSpaceById(@PathVariable Long id) {
         Space space = spaceService.getSpaceById(id);
 
         if (space != null) {
@@ -50,7 +50,7 @@ public class SpaceController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('admin')")
-    public ResponseEntity<Space> updateSpace(@PathVariable int id, @Valid @RequestBody Space space) {
+    public ResponseEntity<Space> updateSpace(@PathVariable Long id, @Valid @RequestBody Space space) {
         Space updatedSpace = spaceService.updateSpace(id, space);
 
         if (updatedSpace != null) {
@@ -62,7 +62,7 @@ public class SpaceController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('admin')")
-    public ResponseEntity<Space> deleteSpace(@PathVariable int id) {
+    public ResponseEntity<Space> deleteSpace(@PathVariable Long id) {
         Space space = spaceService.deleteSpace(id);
 
         if (space != null) {

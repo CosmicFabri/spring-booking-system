@@ -22,7 +22,7 @@ public class SpaceService {
         return spaces;
     }
 
-    public Space getSpaceById(int id) {
+    public Space getSpaceById(Long id) {
         return spaceRepository.findById(id).orElse(null);
     }
 
@@ -30,7 +30,7 @@ public class SpaceService {
         return spaceRepository.save(space);
     }
 
-    public Space updateSpace(int id, Space space) {
+    public Space updateSpace(Long id, Space space) {
         Space updatedSpace = spaceRepository.findById(id).orElse(null);
 
         if (updatedSpace != null) {
@@ -45,7 +45,7 @@ public class SpaceService {
         return null;
     }
 
-    public Space deleteSpace(int id) {
+    public Space deleteSpace(Long id) {
         Space deletedSpace = spaceRepository.findById(id).orElse(null);
 
         if (deletedSpace != null) {

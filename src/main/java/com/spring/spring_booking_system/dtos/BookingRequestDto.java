@@ -11,7 +11,7 @@ import java.time.LocalTime;
 @Setter
 public class BookingRequestDto {
     @NotNull(message = "Space is mandatory.")
-    public Integer idSpace;
+    public Long idSpace;
 
     @NotNull(message = "User is mandatory.")
     public Integer idUser;

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/bookings")
@@ -49,22 +50,30 @@ public class BookingController {
 
     @PostMapping
     @PreAuthorize("hasRole('user')")
-    public ResponseEntity<BookingResponseDto> createBooking(@Valid @RequestBody BookingRequestDto booking) {
-        Booking bookingCreated = bookingService.save(booking);
+    public ResponseEntity<BookingResponseDto> createBooking(@Valid @RequestBody BookingRequestDto request) {
+        if (bookingService.isBookingUnique(request, Optional.empty())) {
+            Booking bookingCreated = bookingService.save(request);
 
-        return ResponseEntity.ok(new BookingResponseDto(bookingCreated));
+            return ResponseEntity.ok(new BookingResponseDto(bookingCreated));
+        }
+
+        return new ResponseEntity<>(HttpStatus.CONFLICT);
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('user')")
-    public ResponseEntity<BookingResponseDto> updateBooking(@PathVariable int id, @Valid @RequestBody Booking booking) {
-        Booking bookingUpdated = bookingService.update(id, booking);
+    public ResponseEntity<BookingResponseDto> updateBooking(@PathVariable int id, @Valid @RequestBody BookingRequestDto request) {
+        Booking booking = bookingService.findById(id);
 
-        if (bookingUpdated != null) {
-            return ResponseEntity.ok(new BookingResponseDto(bookingUpdated));
+        if (booking != null) {
+            if (bookingService.isBookingUnique(request, Optional.of(booking))) {
+                bookingService.update(id, request);
+
+                return ResponseEntity.ok(new BookingResponseDto(booking));
+            }
         }
 
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(HttpStatus.CONFLICT);
     }
 
     @DeleteMapping("/{id}")
