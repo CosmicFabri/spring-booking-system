@@ -30,8 +30,7 @@ public class SecurityConfiguration {
     private final AuthenticationProvider authenticationProvider;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    // List of registered user routes
-    private final String[] userRoutes = {"/user/dashboard", "user/book"};
+    private final String[] userRoutes = {"/user/dashboard", "/user/book"};
 
     public SecurityConfiguration(
             JwtAuthenticationFilter jwtAuthenticationFilter,
@@ -47,7 +46,7 @@ public class SecurityConfiguration {
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
                     .requestMatchers("/auth/**").permitAll()
-                    .requestMatchers("/spaces/**").permitAll()
+                    .requestMatchers("/spaces/**").authenticated()
                     .requestMatchers(userRoutes).authenticated()
                     .anyRequest().permitAll()
             )
