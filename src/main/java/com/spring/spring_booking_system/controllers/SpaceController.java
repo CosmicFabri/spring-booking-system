@@ -5,6 +5,7 @@ import com.spring.spring_booking_system.repositories.SpaceRepository;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,6 +22,7 @@ public class SpaceController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('admin')")
     public ResponseEntity<List<Space>> getSpaces() {
         List<Space> spaces = new ArrayList<>();
         spaceRepository.findAll().forEach(spaces::add);
@@ -29,6 +31,7 @@ public class SpaceController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('admin')")
     public ResponseEntity<Space> getSpaceById(@PathVariable int id) {
         Space space = spaceRepository.findById(id).orElse(null);
 
@@ -40,12 +43,14 @@ public class SpaceController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('admin')")
     public ResponseEntity<Space> addSpace(@Valid @RequestBody Space space) {
         Space newSpace = spaceRepository.save(space);
         return new ResponseEntity<>(newSpace, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('admin')")
     public ResponseEntity<Space> updateSpace(@PathVariable int id, @Valid @RequestBody Space space) {
         Space updatedSpace = spaceRepository.findById(id).orElse(null);
 
@@ -63,6 +68,7 @@ public class SpaceController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('admin')")
     public ResponseEntity<Space> deleteSpace(@PathVariable int id) {
         Space space = spaceRepository.findById(id).orElse(null);
 
