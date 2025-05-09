@@ -1,6 +1,7 @@
 package com.spring.spring_booking_system.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -23,20 +24,25 @@ public class Booking {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "idSpace", referencedColumnName = "id", nullable = false)
+    @NotNull
+    @JoinColumn(name = "idSpace", referencedColumnName = "id")
     private Space space;
 
     @ManyToOne
-    @JoinColumn(name = "idUser", referencedColumnName = "id", nullable = false)
+    @NotNull
+    @JoinColumn(name = "idUser", referencedColumnName = "id")
     private User user;
 
+    @NotNull
     @Column(name = "date", nullable = false)
     private LocalDate date;
 
-    @Column(nullable = false)
+    @NotNull
+    @Column
     private LocalTime startTime;
 
-    @Column(nullable = false)
+    @NotNull
+    @Column
     private LocalTime endTime;
 
     @CreationTimestamp

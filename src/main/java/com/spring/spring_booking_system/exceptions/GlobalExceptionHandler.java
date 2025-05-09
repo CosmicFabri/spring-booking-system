@@ -68,6 +68,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException ex) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                .body(new ErrorResponse("Access denied - can't perform this action with that role."));
+                .body(new ErrorResponse("Access denied - you can't perform this action with that role."));
     }
 }

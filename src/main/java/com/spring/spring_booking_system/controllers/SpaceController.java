@@ -1,7 +1,6 @@
 package com.spring.spring_booking_system.controllers;
 
 import com.spring.spring_booking_system.entities.Space;
-import com.spring.spring_booking_system.repositories.SpaceRepository;
 import com.spring.spring_booking_system.services.SpaceService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -10,7 +9,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Controller
