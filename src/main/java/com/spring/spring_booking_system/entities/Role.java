@@ -20,5 +20,5 @@ public class Role {
     private List<User> users;
 
     @Column(nullable = false)
-    private String description;
+    private String name;
 }

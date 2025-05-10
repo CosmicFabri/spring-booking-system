@@ -16,6 +16,6 @@ public class UserDto {
         this.id = user.getId();
         this.fullName = user.getFullName();
         this.email = user.getEmail();
-        this.role = user.getRole().getDescription();
+        this.role = user.getRole().getName();
     }
 }
