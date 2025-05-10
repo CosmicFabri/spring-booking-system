@@ -70,6 +70,46 @@ public class EmailService {
     }
 
     @Async
+    public void sendReminderEmail(User user, Booking booking, String spaceName) {
+        try {
+            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+
+            helper.setFrom(sender);
+            helper.setTo(user.getEmail());
+            helper.setSubject("Recordatorio de reserva");
+
+            String htmlMsg = String.format("""
+            <html>
+                <body>
+                    <h3>Hola, %s. Te recordamos de tu reserva de mañana</h3>
+                    <p>Detalles de la reserva:</p>
+                    <ul>
+                        <li><strong>Espacio:</strong> %s</li>
+                        <li><strong>Fecha:</strong> %s</li>
+                        <li><strong>Hora de inicio:</strong> %s</li>
+                        <li><strong>Hora de fin:</strong> %s</li>
+                    </ul>
+                </body>
+            </html>
+            """,
+                    user.getFullName(),
+                    spaceName,
+                    booking.getDate(),
+                    booking.getStartTime(),
+                    booking.getEndTime()
+            );
+
+            helper.setText(htmlMsg, true);
+
+            // Send the email
+            javaMailSender.send(mimeMessage);
+        } catch (MessagingException e) {
+            throw new EmailSendingException(e);
+        }
+    }
+
+    @Async
     public void sendSimpleMail(EmailDetails details) {
         try {
             SimpleMailMessage mailMessage = new SimpleMailMessage();

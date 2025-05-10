@@ -1,5 +1,6 @@
 package com.spring.spring_booking_system.entities;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -39,10 +40,12 @@ public class Booking {
 
     @NotNull
     @Column
+    @JsonFormat(pattern = "HH:mm")
     private LocalTime startTime;
 
     @NotNull
     @Column
+    @JsonFormat(pattern = "HH:mm")
     private LocalTime endTime;
 
     @CreationTimestamp
