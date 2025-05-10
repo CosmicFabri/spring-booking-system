@@ -1,6 +1,9 @@
 package com.spring.spring_booking_system.entities;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -35,10 +38,12 @@ public class Space {
 
     @Column(nullable = false)
     @NotNull(message = "Disponibility start is mandatory.")
+    @JsonFormat(pattern = "HH:mm")
     private LocalTime disponibilityStart;
 
     @Column(nullable = false)
     @NotNull(message = "Disponibility end is mandatory.")
+    @JsonFormat(pattern = "HH:mm")
     private LocalTime disponibilityEnd;
 
     @CreationTimestamp
@@ -48,4 +53,10 @@ public class Space {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private Date updatedAt;
+
+    @AssertTrue(message = "disponibilityEnd must be after disponibilityStart")
+    @JsonIgnore
+    public boolean isDisponibilityValid() {
+        return disponibilityEnd.isAfter(disponibilityStart);
+    }
 }
