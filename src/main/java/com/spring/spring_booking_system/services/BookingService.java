@@ -9,8 +9,11 @@ import com.spring.spring_booking_system.repositories.SpaceRepository;
 import com.spring.spring_booking_system.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class BookingService {
@@ -53,7 +56,7 @@ public class BookingService {
         return bookingRepository.findById(id).orElse(null);
     }
 
-    public Booking update(int id, Booking booking) {
+    public Booking update(int id, BookingRequestDto booking) {
         Booking updatedBooking = bookingRepository.findById(id).orElse(null);
 
         if (updatedBooking != null) {
@@ -76,5 +79,36 @@ public class BookingService {
         }
 
         return null;
+    }
+
+    // Checks if the booking time interval doesn't overlap with another one
+    public boolean isBookingUnique(BookingRequestDto request, Optional<Booking> booking) {
+        LocalDate date = request.getDate();
+        Long idSpace = request.getIdSpace();
+        LocalTime startTime = request.getStartTime();
+        LocalTime endTime = request.getEndTime();
+
+        // List of bookings that match the same day and space
+        List<Booking> bookings = bookingRepository.findAllByDateAndSpace_Id(date, idSpace);
+
+        // Exclude the booking from the list of current bookings if it's being updated
+        Long id = booking.map(Booking::getId).orElse(null);
+
+        for (Booking currentBooking : bookings) {
+            // Exclude booking being updated
+            if (currentBooking.getId().equals(id)) {
+                continue;
+            }
+
+            LocalTime currentStartTime = currentBooking.getStartTime();
+            LocalTime currentEndTime = currentBooking.getEndTime();
+
+            // If the interval overlaps, return false
+            if (startTime.isBefore(currentEndTime) && endTime.isAfter(currentStartTime)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
