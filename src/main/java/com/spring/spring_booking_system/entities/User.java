@@ -20,10 +20,10 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false)
-    private Integer id;
+    private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "idRol", nullable = false)
+    @JoinColumn(name = "idRole", nullable = false)
     private Role role;
 
     @Column(unique = true, nullable = false)

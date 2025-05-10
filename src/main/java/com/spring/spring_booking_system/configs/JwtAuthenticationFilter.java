@@ -44,7 +44,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         final String jwt = authHeader.substring(7);
-        final Integer userId;
+        final Long userId;
 
         try {
             userId = jwtService.extractId(jwt);

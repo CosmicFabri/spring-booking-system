@@ -1,7 +1,7 @@
 package com.spring.spring_booking_system.services;
 
-import com.spring.spring_booking_system.dtos.LoginUserDto;
-import com.spring.spring_booking_system.dtos.RegisterUserDto;
+import com.spring.spring_booking_system.dtos.requests.LoginRequest;
+import com.spring.spring_booking_system.dtos.requests.RegisterRequest;
 import com.spring.spring_booking_system.entities.Role;
 import com.spring.spring_booking_system.entities.User;
 import com.spring.spring_booking_system.repositories.RoleRepository;
@@ -38,7 +38,7 @@ public class AuthenticationService {
         this.authenticationManager = authenticationManager;
     }
 
-    public User signup(RegisterUserDto input) {
+    public User signup(RegisterRequest input) {
         User user = new User();
 
         Role role = roleRepository.findById(input.getRoleId())
@@ -52,7 +52,7 @@ public class AuthenticationService {
         return userRepository.save(user);
     }
 
-    public User authenticate(LoginUserDto input) {
+    public User authenticate(LoginRequest input) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         input.getEmail(),

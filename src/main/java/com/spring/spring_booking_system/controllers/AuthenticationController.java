@@ -1,9 +1,9 @@
 package com.spring.spring_booking_system.controllers;
 
-import com.spring.spring_booking_system.dtos.LoginGoogleDto;
-import com.spring.spring_booking_system.dtos.LoginUserDto;
-import com.spring.spring_booking_system.dtos.RegisterUserDto;
-import com.spring.spring_booking_system.dtos.UserResponseDto;
+import com.spring.spring_booking_system.dtos.requests.LoginGoogleRequest;
+import com.spring.spring_booking_system.dtos.requests.LoginRequest;
+import com.spring.spring_booking_system.dtos.requests.RegisterRequest;
+import com.spring.spring_booking_system.dtos.UserDto;
 import com.spring.spring_booking_system.entities.User;
 import com.spring.spring_booking_system.responses.LoginResponse;
 import com.spring.spring_booking_system.services.AuthenticationService;
@@ -30,14 +30,14 @@ public class AuthenticationController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<UserResponseDto> signup(@Valid @RequestBody RegisterUserDto registerUserDto) {
-        User registeredUser = authenticationService.signup(registerUserDto);
-        return ResponseEntity.ok(new UserResponseDto(registeredUser));
+    public ResponseEntity<UserDto> signup(@Valid @RequestBody RegisterRequest registerRequest) {
+        User registeredUser = authenticationService.signup(registerRequest);
+        return ResponseEntity.ok(new UserDto(registeredUser));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginUserDto loginUserDto) {
-        User loggedUser = authenticationService.authenticate(loginUserDto);
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
+        User loggedUser = authenticationService.authenticate(loginRequest);
         String jwtToken = jwtService.generateToken(loggedUser);
         LoginResponse loginResponse = new LoginResponse();
 
@@ -48,8 +48,8 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login/google")
-    public ResponseEntity<LoginResponse> googleLogin(@RequestBody LoginGoogleDto loginGoogleDto) {
-        String googleToken = loginGoogleDto.googleToken;
+    public ResponseEntity<LoginResponse> googleLogin(@RequestBody LoginGoogleRequest loginGoogleRequest) {
+        String googleToken = loginGoogleRequest.googleToken;
         User loggedUser = authenticationService.authenticateWithGoogleToken(googleToken);
 
         String jwtToken = jwtService.generateToken(loggedUser);

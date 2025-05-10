@@ -16,7 +16,7 @@ public class Role {
     private Long id;
 
     @OneToMany
-    @JoinColumn(name = "idRol", referencedColumnName = "id")
+    @JoinColumn(name = "idRole", referencedColumnName = "id")
     private List<User> users;
 
     @Column(nullable = false)

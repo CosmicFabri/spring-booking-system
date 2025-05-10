@@ -9,6 +9,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Date;
 
@@ -34,22 +35,22 @@ public class Booking {
     private User user;
 
     @NotNull
-    @Column(name = "date", nullable = false)
-    private LocalDate date;
+    @Column(name = "day", nullable = false)
+    private LocalDate day;
 
     @NotNull
-    @Column
-    private LocalTime startTime;
+    @Column(columnDefinition = "TIME")
+    private LocalTime startHour;
 
     @NotNull
-    @Column
-    private LocalTime endTime;
+    @Column(columnDefinition = "TIME")
+    private LocalTime endHour;
 
     @CreationTimestamp
     @Column(updatable = false, name = "created_at")
-    private Date createdAt;
+    private LocalDateTime createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at")
-    private Date updatedAt;
+    private LocalDateTime updatedAt;
 }

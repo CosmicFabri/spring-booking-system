@@ -1,4 +1,4 @@
-package com.spring.spring_booking_system.dtos;
+package com.spring.spring_booking_system.dtos.requests;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Email;
@@ -9,7 +9,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class RegisterUserDto {
+public class RegisterRequest {
     @JsonProperty("idRol")
     @NotNull(message = "Role ID is mandatory.")
     private Long roleId;

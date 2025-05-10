@@ -1,12 +1,10 @@
 package com.spring.spring_booking_system.controllers;
 
-import com.spring.spring_booking_system.dtos.BookingRequestDto;
-import com.spring.spring_booking_system.dtos.BookingResponseDto;
+import com.spring.spring_booking_system.dtos.requests.BookingRequest;
+import com.spring.spring_booking_system.dtos.responses.BookingResponse;
 import com.spring.spring_booking_system.entities.Booking;
-import com.spring.spring_booking_system.entities.User;
 import com.spring.spring_booking_system.repositories.UserRepository;
 import com.spring.spring_booking_system.services.BookingService;
-import com.spring.spring_booking_system.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,25 +33,25 @@ public class BookingController {
 
     @GetMapping
     @PreAuthorize("hasRole('admin')")
-    public ResponseEntity<List<BookingResponseDto>> getAllBookings() {
+    public ResponseEntity<List<BookingResponse>> getAllBookings() {
         List<Booking> bookings = bookingService.findAll();
-        List<BookingResponseDto> bookingResponseDtos = new ArrayList<>();
+        List<BookingResponse> bookingResponses = new ArrayList<>();
         for (Booking booking : bookings) {
-            bookingResponseDtos.add(new BookingResponseDto(booking));
+            bookingResponses.add(new BookingResponse(booking));
         }
 
-        return ResponseEntity.ok(bookingResponseDtos);
+        return ResponseEntity.ok(bookingResponses);
     }
 
     // getUserBookings
 
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('admin')")
-    public ResponseEntity<BookingResponseDto> getBookingById(@PathVariable int id) {
+    public ResponseEntity<BookingResponse> getBookingById(@PathVariable int id) {
         Booking booking = bookingService.findById(id);
 
         if (booking != null) {
-            return ResponseEntity.ok(new BookingResponseDto(booking));
+            return ResponseEntity.ok(new BookingResponse(booking));
         }
 
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -61,15 +59,15 @@ public class BookingController {
 
     @PostMapping
     @PreAuthorize("hasRole('user')")
-    public ResponseEntity<BookingResponseDto> createBooking(@Valid @RequestBody BookingRequestDto request) {
+    public ResponseEntity<BookingResponse> createBooking(@Valid @RequestBody BookingRequest request) {
         // Get the ID of the authenticated user
-        Integer userId = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         if (bookingService.isBookingUnique(request, Optional.empty())) {
             request.setIdUser(userId);
             Booking bookingCreated = bookingService.save(request);
 
-            return ResponseEntity.ok(new BookingResponseDto(bookingCreated));
+            return ResponseEntity.ok(new BookingResponse(bookingCreated));
         }
 
         return new ResponseEntity<>(HttpStatus.CONFLICT);
@@ -77,7 +75,7 @@ public class BookingController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('user')")
-    public ResponseEntity<BookingResponseDto> updateBooking(@PathVariable int id, @Valid @RequestBody BookingRequestDto request) {
+    public ResponseEntity<BookingResponse> updateBooking(@PathVariable int id, @Valid @RequestBody BookingRequest request) {
         // Get the ID of the authenticated user
         Integer userId = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
@@ -91,7 +89,7 @@ public class BookingController {
             if (bookingService.isBookingUnique(request, Optional.of(booking))) {
                 bookingService.update(id, request);
 
-                return ResponseEntity.ok(new BookingResponseDto(booking));
+                return ResponseEntity.ok(new BookingResponse(booking));
             }
         }
 
@@ -100,11 +98,11 @@ public class BookingController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('user', 'admin')")
-    public ResponseEntity<BookingResponseDto> deleteBooking(@PathVariable int id) {
+    public ResponseEntity<BookingResponse> deleteBooking(@PathVariable int id) {
         Booking booking = bookingService.delete(id);
 
         if (booking != null) {
-            return ResponseEntity.ok(new BookingResponseDto(booking));
+            return ResponseEntity.ok(new BookingResponse(booking));
         }
 
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);

@@ -1,28 +1,29 @@
-package com.spring.spring_booking_system.dtos;
+package com.spring.spring_booking_system.dtos.responses;
 
 import com.spring.spring_booking_system.entities.Booking;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Date;
 
-public class BookingResponseDto {
+public class BookingResponse {
     public Long id;
     public Long spaceId;
-    public Integer userId;
+    public Long userId;
     public LocalDate date;
     public LocalTime startTime;
     public LocalTime endTime;
-    public Date createdAt;
-    public Date updatedAt;
+    public LocalDateTime createdAt;
+    public LocalDateTime updatedAt;
 
-    public BookingResponseDto(Booking booking) {
+    public BookingResponse(Booking booking) {
         this.id = booking.getId();
         this.spaceId = booking.getSpace().getId();
         this.userId = booking.getUser().getId();
-        this.date = booking.getDate();
-        this.startTime = booking.getStartTime();
-        this.endTime = booking.getEndTime();
+        this.date = booking.getDay();
+        this.startTime = booking.getStartHour();
+        this.endTime = booking.getEndHour();
         this.createdAt = booking.getCreatedAt();
         this.updatedAt = booking.getUpdatedAt();
     }

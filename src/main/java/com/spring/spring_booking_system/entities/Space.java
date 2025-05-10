@@ -9,6 +9,7 @@ import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Date;
 
@@ -33,19 +34,19 @@ public class Space {
     @NotNull(message = "Capacity is mandatory.")
     private int capacity;
 
-    @Column(nullable = false)
+    @Column(columnDefinition = "TIME", nullable = false)
     @NotNull(message = "Disponibility start is mandatory.")
     private LocalTime disponibilityStart;
 
-    @Column(nullable = false)
+    @Column(columnDefinition = "TIME", nullable = false)
     @NotNull(message = "Disponibility end is mandatory.")
     private LocalTime disponibilityEnd;
 
     @CreationTimestamp
     @Column(updatable = false, name = "created_at")
-    private Date createdAt;
+    private LocalDateTime createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at")
-    private Date updatedAt;
+    private LocalDateTime updatedAt;
 }
