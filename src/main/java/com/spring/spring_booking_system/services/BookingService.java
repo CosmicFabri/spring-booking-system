@@ -4,6 +4,7 @@ import com.spring.spring_booking_system.dtos.BookingRequestDto;
 import com.spring.spring_booking_system.entities.Booking;
 import com.spring.spring_booking_system.entities.Space;
 import com.spring.spring_booking_system.entities.User;
+import com.spring.spring_booking_system.exceptions.UserNotFoundException;
 import com.spring.spring_booking_system.repositories.BookingRepository;
 import com.spring.spring_booking_system.repositories.SpaceRepository;
 import com.spring.spring_booking_system.repositories.UserRepository;
@@ -20,20 +21,23 @@ public class BookingService {
     private final BookingRepository bookingRepository;
     private final SpaceRepository spaceRepository;
     private final UserRepository userRepository;
+    private final EmailService emailService;
 
     public BookingService(
             BookingRepository bookingRepository,
             SpaceRepository spaceRepository,
-            UserRepository userRepository
+            UserRepository userRepository,
+            EmailService emailService
     ) {
         this.bookingRepository = bookingRepository;
         this.spaceRepository = spaceRepository;
         this.userRepository = userRepository;
+        this.emailService = emailService;
     }
 
     public Booking save(BookingRequestDto request) {
         Space space = spaceRepository.findById(request.getIdSpace()).orElse(null);
-        User user = userRepository.findById(request.getIdUser()).orElse(null);
+        User user = userRepository.findById(request.getIdUser()).orElseThrow(() -> new UserNotFoundException(request.getIdUser()));
 
         Booking booking = new Booking();
         booking.setSpace(space);
@@ -41,6 +45,9 @@ public class BookingService {
         booking.setDate(request.date);
         booking.setStartTime(request.startTime);
         booking.setEndTime(request.endTime);
+
+        // Send the confirmation email
+        emailService.sendConfirmationEmail(user, booking, space.getName());
 
         return bookingRepository.save(booking);
     }
