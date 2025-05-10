@@ -1,5 +1,6 @@
 package com.spring.spring_booking_system.controllers;
 
+import com.spring.spring_booking_system.dtos.LoginGoogleDto;
 import com.spring.spring_booking_system.dtos.LoginUserDto;
 import com.spring.spring_booking_system.dtos.RegisterUserDto;
 import com.spring.spring_booking_system.dtos.UserResponseDto;
@@ -43,6 +44,19 @@ public class AuthenticationController {
         loginResponse.setToken(jwtToken);
         loginResponse.setExpiresIn(jwtService.getExpirationTime());
 
+        return ResponseEntity.ok(loginResponse);
+    }
+
+    @PostMapping("/login/google")
+    public ResponseEntity<LoginResponse> googleLogin(@RequestBody LoginGoogleDto loginGoogleDto) {
+        String googleToken = loginGoogleDto.googleToken;
+        User loggedUser = authenticationService.authenticateWithGoogleToken(googleToken);
+
+        String jwtToken = jwtService.generateToken(loggedUser);
+        LoginResponse loginResponse = new LoginResponse();
+
+        loginResponse.setToken(jwtToken);
+        loginResponse.setExpiresIn(jwtService.getExpirationTime());
         return ResponseEntity.ok(loginResponse);
     }
 }
