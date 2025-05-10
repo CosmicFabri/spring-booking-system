@@ -4,9 +4,7 @@ import com.spring.spring_booking_system.dtos.BookingRequestDto;
 import com.spring.spring_booking_system.dtos.BookingResponseDto;
 import com.spring.spring_booking_system.entities.Booking;
 import com.spring.spring_booking_system.entities.User;
-import com.spring.spring_booking_system.repositories.UserRepository;
 import com.spring.spring_booking_system.services.BookingService;
-import com.spring.spring_booking_system.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,22 +13,15 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Controller
 @RequestMapping("/bookings")
 public class BookingController {
     private final BookingService bookingService;
-    private final UserRepository userRepository;
 
-    public BookingController(
-            BookingService bookingService,
-            UserRepository userRepository
-    ) {
+    public BookingController(BookingService bookingService) {
         this.bookingService = bookingService;
-        this.userRepository = userRepository;
     }
 
     @GetMapping
@@ -78,35 +69,71 @@ public class BookingController {
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('user')")
     public ResponseEntity<BookingResponseDto> updateBooking(@PathVariable int id, @Valid @RequestBody BookingRequestDto request) {
-        // Get the ID of the authenticated user
-        Integer userId = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
         Booking booking = bookingService.findById(id);
+
+        if (booking == null) {
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
+
+        Integer userId = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         if (!booking.getUser().getId().equals(userId)) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
-        if (booking != null) {
-            if (bookingService.isBookingUnique(request, Optional.of(booking))) {
-                bookingService.update(id, request);
+        if (bookingService.isBookingUnique(request, Optional.of(booking))) {
+            bookingService.update(id, request);
 
-                return ResponseEntity.ok(new BookingResponseDto(booking));
-            }
+            return ResponseEntity.ok(new BookingResponseDto(booking));
         }
 
-        return new ResponseEntity<>(HttpStatus.CONFLICT);
+        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('user', 'admin')")
-    public ResponseEntity<BookingResponseDto> deleteBooking(@PathVariable int id) {
-        Booking booking = bookingService.delete(id);
+    public ResponseEntity<Map<String, Object>> deleteBooking(@PathVariable int id) {
+        Map<String, Object> response = new HashMap<>();
+        Booking booking = bookingService.findById(id);
 
-        if (booking != null) {
-            return ResponseEntity.ok(new BookingResponseDto(booking));
+        if (booking == null) {
+            response.put("error", "Couldn't find a booking with such ID.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
 
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        String role = "" + SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+
+        if (role.equals("[ROLE_admin]")) {
+            // An admin can delete a booking whenever he wants
+            booking = bookingService.delete(id);
+
+            response.put("message", "Booking deleted successfully.");
+            response.put("booking", new BookingResponseDto(booking));
+
+            return ResponseEntity.ok(response);
+        } else if (role.equals("[ROLE_user]")) {
+            // Get the ID of the authenticated user
+            Integer userId = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+            // Get the user ID related to the booking ID of the request
+            User user = bookingService.findById(id).getUser();
+            Integer requestUserId = user.getId();
+
+            if (!userId.equals(requestUserId)) {
+                response.put("error", "You can't delete other's booking.");
+
+                return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+            }
+
+            booking = bookingService.delete(id);
+
+            response.put("message", "Booking deleted successfully.");
+            response.put("booking", new BookingResponseDto(booking));
+
+            return ResponseEntity.ok(response);
+        }
+
+        response.put("error", "Role not authorized for this operation.");
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
 }
