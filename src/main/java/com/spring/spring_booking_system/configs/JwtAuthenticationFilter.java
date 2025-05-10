@@ -44,22 +44,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         final String jwt = authHeader.substring(7);
-        final String userEmail;
+        final Integer userId;
 
         try {
-            userEmail = jwtService.extractUsername(jwt);
+            userId = jwtService.extractId(jwt);
         } catch (Exception e) {
             // Malformed or tampered token, return 401 Unauthorized
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid or malformed JWT token");
             return;
         }
 
-        if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
+        if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails userDetails = userDetailsService.loadUserByUsername(jwtService.extractUsername(jwt));
 
             if (jwtService.isTokenValid(jwt, userDetails)) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,
+                        userId,
                         null,
                         userDetails.getAuthorities()
                 );

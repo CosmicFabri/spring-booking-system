@@ -1,6 +1,8 @@
 package com.spring.spring_booking_system.services;
 
 
+import com.spring.spring_booking_system.entities.User;
+import com.spring.spring_booking_system.repositories.UserRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -10,6 +12,7 @@ import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -18,6 +21,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class JwtService {
+    private final UserRepository userRepository;
+
+    public JwtService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
     @Value("${security.jwt.secret-key}")
     private String secretKey;
 
@@ -26,6 +35,13 @@ public class JwtService {
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
+    }
+
+    public Integer extractId(String token) {
+        String username = extractUsername(token);
+        Optional<User> user = userRepository.findByEmail(username);
+
+        return user.map(User::getId).orElse(null);
     }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
