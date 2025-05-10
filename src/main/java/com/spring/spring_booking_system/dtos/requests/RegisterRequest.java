@@ -10,7 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class RegisterRequest {
-    @JsonProperty("idRol")
+    @JsonProperty("idRole")
     @NotNull(message = "Role ID is mandatory.")
     private Long roleId;
 
