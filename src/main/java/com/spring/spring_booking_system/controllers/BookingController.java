@@ -23,6 +23,8 @@ public class BookingController {
     private final BookingService bookingService;
     private final SpaceService spaceService;
 
+    Map<String, Object> response = new HashMap<>();
+
     public BookingController(
             BookingService bookingService,
             SpaceService spaceService
@@ -31,7 +33,7 @@ public class BookingController {
         this.spaceService = spaceService;
     }
 
-    @GetMapping
+    @GetMapping("/all")
     @PreAuthorize("hasRole('admin')")
     public ResponseEntity<List<BookingResponseDto>> getAllBookings() {
         List<Booking> bookings = bookingService.findAll();
@@ -44,12 +46,34 @@ public class BookingController {
         return ResponseEntity.ok(bookingResponseDtos);
     }
 
-    // getUserBookings
+    @GetMapping("/user")
+    @PreAuthorize("hasRole('user')")
+    public ResponseEntity<Map<String, Object>> getUserBookings() {
+        // Get the ID of the authenticated user
+        Integer userId = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        // Error: no user authenticated
+        if (userId == null) {
+            response.put("error", "No user authenticated.");
+        }
+
+        // Get all the bookings by userId
+        List<Booking> bookings = bookingService.findAllByUserId(userId);
+        List<BookingResponseDto> bookingResponseDtos = new ArrayList<>();
+
+        for (Booking booking : bookings) {
+            bookingResponseDtos.add(new BookingResponseDto(booking));
+        }
+
+        response.put("message", "Bookings retrieved correctly.");
+        response.put("bookings", bookingResponseDtos);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('admin')")
     public ResponseEntity<Map<String, Object>> getBookingById(@PathVariable int id) {
-        Map<String, Object> response = new HashMap<>();
         Booking booking = bookingService.findById(id);
 
         // Error: no booking with such ID
@@ -67,8 +91,6 @@ public class BookingController {
     @PostMapping
     @PreAuthorize("hasRole('user')")
     public ResponseEntity<Map<String, Object>> createBooking(@Valid @RequestBody BookingRequestDto request) {
-        Map<String, Object> response = new HashMap<>();
-
         // Get the space base off of the ID of the request
         Space space = spaceService.getSpaceById(request.getIdSpace());
 
@@ -100,8 +122,6 @@ public class BookingController {
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('user')")
     public ResponseEntity<Map<String, Object>> updateBooking(@PathVariable int id, @Valid @RequestBody BookingRequestDto request) {
-        Map<String, Object> response = new HashMap<>();
-
         Booking booking = bookingService.findById(id);
 
         // Error: no booking with such ID
@@ -138,7 +158,6 @@ public class BookingController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('user', 'admin')")
     public ResponseEntity<Map<String, Object>> deleteBooking(@PathVariable int id) {
-        Map<String, Object> response = new HashMap<>();
         Booking booking = bookingService.findById(id);
 
         if (booking == null) {
