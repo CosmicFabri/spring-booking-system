@@ -20,12 +20,8 @@ public class EmailController {
 
     @PostMapping("/sendmail")
     public ResponseEntity<EmailDetails> sendMail(@RequestBody EmailDetails details) {
-        boolean result = emailService.sendSimpleMail(details);
+        emailService.sendSimpleMail(details);
 
-        if (result) {
-            return ResponseEntity.ok(details);
-        } else {
-            return ResponseEntity.badRequest().build();
-        }
+        return ResponseEntity.ok(details);
     }
 }

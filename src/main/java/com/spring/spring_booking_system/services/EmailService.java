@@ -1,16 +1,18 @@
 package com.spring.spring_booking_system.services;
 
 import com.spring.spring_booking_system.entities.EmailDetails;
-
 import java.io.File;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.scheduling.annotation.Async;
+import com.spring.spring_booking_system.exceptions.EmailSendingException;
 
 @Service
 public class EmailService {
@@ -23,7 +25,8 @@ public class EmailService {
         this.javaMailSender = javaMailSender;
     }
 
-    public boolean sendSimpleMail(EmailDetails details) {
+    @Async
+    public void sendSimpleMail(EmailDetails details) {
         try {
             SimpleMailMessage mailMessage = new SimpleMailMessage();
 
@@ -35,13 +38,13 @@ public class EmailService {
 
             // Send the email
             javaMailSender.send(mailMessage);
-            return true;
         } catch (Exception e) {
-            return false;
+            throw new EmailSendingException(e);
         }
     }
 
-    public boolean sendMailWithAttachment(EmailDetails details) {
+    @Async
+    public void sendMailWithAttachment(EmailDetails details) {
         // Creating a mime message
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         MimeMessageHelper mimeMessageHelper;
@@ -61,9 +64,8 @@ public class EmailService {
 
             // Send the email
             javaMailSender.send(mimeMessage);
-            return true;
         } catch (MessagingException e) {
-            return false;
+            throw new EmailSendingException(e);
         }
     }
 }
