@@ -10,11 +10,10 @@ import java.time.LocalTime;
 @Getter
 @Setter
 public class BookingRequestDto {
+    public Integer idUser;
+
     @NotNull(message = "Space is mandatory.")
     public Long idSpace;
-
-    @NotNull(message = "User is mandatory.")
-    public Integer idUser;
 
     @NotNull(message = "Date is mandatory.")
     public LocalDate date;
