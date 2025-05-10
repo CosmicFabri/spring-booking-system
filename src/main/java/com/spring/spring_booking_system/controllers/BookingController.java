@@ -3,7 +3,6 @@ package com.spring.spring_booking_system.controllers;
 import com.spring.spring_booking_system.dtos.BookingRequestDto;
 import com.spring.spring_booking_system.dtos.BookingResponseDto;
 import com.spring.spring_booking_system.entities.Booking;
-import com.spring.spring_booking_system.entities.User;
 import com.spring.spring_booking_system.repositories.UserRepository;
 import com.spring.spring_booking_system.services.BookingService;
 import com.spring.spring_booking_system.services.UserService;
