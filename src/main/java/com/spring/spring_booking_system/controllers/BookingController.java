@@ -82,7 +82,7 @@ public class BookingController {
     @PreAuthorize("hasRole('user')")
     public ResponseEntity<BookingResponse> updateBooking(@PathVariable int id, @Valid @RequestBody BookingRequest request) {
         // Get the ID of the authenticated user
-        Integer userId = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         Booking booking = bookingService.findById(id);
 
@@ -91,7 +91,6 @@ public class BookingController {
             //response.put("error", "No such booking exists.");
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
-
 
         // Error: user ID doesn't match
         if (!booking.getUser().getId().equals(userId)) {
