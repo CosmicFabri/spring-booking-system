@@ -37,7 +37,7 @@ public class JwtService {
         return extractClaim(token, Claims::getSubject);
     }
 
-    public Integer extractId(String token) {
+    public Long extractId(String token) {
         String username = extractUsername(token);
         Optional<User> user = userRepository.findByEmail(username);
 

@@ -1,7 +1,11 @@
 package com.spring.spring_booking_system.services;
 
+import com.spring.spring_booking_system.entities.Booking;
 import com.spring.spring_booking_system.entities.EmailDetails;
+
 import java.io.File;
+
+import com.spring.spring_booking_system.entities.User;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,6 +27,86 @@ public class EmailService {
 
     public EmailService(JavaMailSender javaMailSender) {
         this.javaMailSender = javaMailSender;
+    }
+
+    @Async
+    public void sendConfirmationEmail(User user, Booking booking, String spaceName) {
+        try {
+            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+
+            helper.setFrom(sender);
+            helper.setTo(user.getEmail());
+            helper.setSubject("Confirmación de reserva");
+
+            String htmlMsg = String.format("""
+            <html>
+                <body>
+                    <h3>Hola, %s. Te confirmamos tu reservación</h3>
+                    <p>Detalles de la reserva:</p>
+                    <ul>
+                        <li><strong>Espacio:</strong> %s</li>
+                        <li><strong>Fecha:</strong> %s</li>
+                        <li><strong>Hora de inicio:</strong> %s</li>
+                        <li><strong>Hora de fin:</strong> %s</li>
+                    </ul>
+                </body>
+            </html>
+            """,
+                    user.getFullName(),
+                    spaceName,
+                    booking.getDay(),
+                    booking.getStartHour(),
+                    booking.getEndHour()
+            );
+
+            helper.setText(htmlMsg, true);
+
+            // Send the email
+            javaMailSender.send(mimeMessage);
+        } catch (MessagingException e) {
+            throw new EmailSendingException(e);
+        }
+    }
+
+    @Async
+    public void sendReminderEmail(User user, Booking booking, String spaceName) {
+        try {
+            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+
+            helper.setFrom(sender);
+            helper.setTo(user.getEmail());
+            helper.setSubject("Recordatorio de reserva");
+
+            String htmlMsg = String.format("""
+            <html>
+                <body>
+                    <h3>Hola, %s. Te recordamos de tu reserva de mañana</h3>
+                    <p>Detalles de la reserva:</p>
+                    <ul>
+                        <li><strong>Espacio:</strong> %s</li>
+                        <li><strong>Fecha:</strong> %s</li>
+                        <li><strong>Hora de inicio:</strong> %s</li>
+                        <li><strong>Hora de fin:</strong> %s</li>
+                    </ul>
+                </body>
+            </html>
+            """,
+                    user.getFullName(),
+                    spaceName,
+                    booking.getDay(),
+                    booking.getStartHour(),
+                    booking.getEndHour()
+            );
+
+            helper.setText(htmlMsg, true);
+
+            // Send the email
+            javaMailSender.send(mimeMessage);
+        } catch (MessagingException e) {
+            throw new EmailSendingException(e);
+        }
     }
 
     @Async

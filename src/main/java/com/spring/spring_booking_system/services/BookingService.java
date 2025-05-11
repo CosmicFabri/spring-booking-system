@@ -1,9 +1,10 @@
 package com.spring.spring_booking_system.services;
 
-import com.spring.spring_booking_system.dtos.BookingRequestDto;
+import com.spring.spring_booking_system.dtos.requests.BookingRequest;
 import com.spring.spring_booking_system.entities.Booking;
 import com.spring.spring_booking_system.entities.Space;
 import com.spring.spring_booking_system.entities.User;
+import com.spring.spring_booking_system.exceptions.UserNotFoundException;
 import com.spring.spring_booking_system.repositories.BookingRepository;
 import com.spring.spring_booking_system.repositories.SpaceRepository;
 import com.spring.spring_booking_system.repositories.UserRepository;
@@ -20,27 +21,33 @@ public class BookingService {
     private final BookingRepository bookingRepository;
     private final SpaceRepository spaceRepository;
     private final UserRepository userRepository;
+    private final EmailService emailService;
 
     public BookingService(
             BookingRepository bookingRepository,
             SpaceRepository spaceRepository,
-            UserRepository userRepository
+            UserRepository userRepository,
+            EmailService emailService
     ) {
         this.bookingRepository = bookingRepository;
         this.spaceRepository = spaceRepository;
         this.userRepository = userRepository;
+        this.emailService = emailService;
     }
 
-    public Booking save(BookingRequestDto request) {
+    public Booking save(BookingRequest request) {
         Space space = spaceRepository.findById(request.getIdSpace()).orElse(null);
-        User user = userRepository.findById(request.getIdUser()).orElse(null);
+        User user = userRepository.findById(request.getIdUser()).orElseThrow(() -> new UserNotFoundException(request.getIdUser()));
 
         Booking booking = new Booking();
         booking.setSpace(space);
         booking.setUser(user);
-        booking.setDate(request.date);
-        booking.setStartTime(request.startTime);
-        booking.setEndTime(request.endTime);
+        booking.setDay(request.day);
+        booking.setStartHour(request.startHour);
+        booking.setEndHour(request.endHour);
+
+        // Send the confirmation email
+        emailService.sendConfirmationEmail(user, booking, space.getName());
 
         return bookingRepository.save(booking);
     }
@@ -60,12 +67,12 @@ public class BookingService {
         return bookingRepository.findById(id).orElse(null);
     }
 
-    public Booking update(int id, BookingRequestDto booking) {
+    public Booking update(int id, BookingRequest booking) {
         Booking updatedBooking = bookingRepository.findById(id).orElse(null);
 
         if (updatedBooking != null) {
-            updatedBooking.setStartTime(booking.getStartTime());
-            updatedBooking.setEndTime(booking.getEndTime());
+            updatedBooking.setStartHour(booking.getStartHour());
+            updatedBooking.setEndHour(booking.getEndHour());
 
             return bookingRepository.save(updatedBooking);
         }
@@ -85,15 +92,19 @@ public class BookingService {
         return null;
     }
 
+    public List<Booking> getPendingUserBookings(Long userId) {
+        return bookingRepository.findByUserPending(LocalDate.now(), LocalTime.now(), userId);
+    }
+
     // Checks if the booking time interval doesn't overlap with another one
-    public boolean isBookingUnique(BookingRequestDto request, Optional<Booking> booking) {
-        LocalDate date = request.getDate();
+    public boolean isBookingUnique(BookingRequest request, Optional<Booking> booking) {
+        LocalDate date = request.getDay();
         Long idSpace = request.getIdSpace();
-        LocalTime startTime = request.getStartTime();
-        LocalTime endTime = request.getEndTime();
+        LocalTime startTime = request.getStartHour();
+        LocalTime endTime = request.getEndHour();
 
         // List of bookings that match the same day and space
-        List<Booking> bookings = bookingRepository.findAllByDateAndSpace_Id(date, idSpace);
+        List<Booking> bookings = bookingRepository.findAllByDayAndSpace_Id(date, idSpace);
 
         // Exclude the booking from the list of current bookings if it's being updated
         Long id = booking.map(Booking::getId).orElse(null);
@@ -104,8 +115,8 @@ public class BookingService {
                 continue;
             }
 
-            LocalTime currentStartTime = currentBooking.getStartTime();
-            LocalTime currentEndTime = currentBooking.getEndTime();
+            LocalTime currentStartTime = currentBooking.getStartHour();
+            LocalTime currentEndTime = currentBooking.getEndHour();
 
             // If the interval overlaps, return false
             if (startTime.isBefore(currentEndTime) && endTime.isAfter(currentStartTime)) {

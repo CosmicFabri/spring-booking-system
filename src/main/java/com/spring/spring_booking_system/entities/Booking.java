@@ -1,5 +1,6 @@
 package com.spring.spring_booking_system.entities;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -9,8 +10,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Date;
 
 @Getter
 @Setter
@@ -34,22 +35,24 @@ public class Booking {
     private User user;
 
     @NotNull
-    @Column(name = "date", nullable = false)
-    private LocalDate date;
+    @Column(name = "day", nullable = false)
+    private LocalDate day;
 
     @NotNull
-    @Column
-    private LocalTime startTime;
+    @Column(columnDefinition = "TIME")
+    @JsonFormat(pattern = "HH:mm")
+    private LocalTime startHour;
 
     @NotNull
-    @Column
-    private LocalTime endTime;
+    @Column(columnDefinition = "TIME")
+    @JsonFormat(pattern = "HH:mm")
+    private LocalTime endHour;
 
     @CreationTimestamp
     @Column(updatable = false, name = "created_at")
-    private Date createdAt;
+    private LocalDateTime createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at")
-    private Date updatedAt;
+    private LocalDateTime updatedAt;
 }

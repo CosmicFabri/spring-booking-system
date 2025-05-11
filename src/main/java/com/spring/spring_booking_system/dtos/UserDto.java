@@ -6,16 +6,16 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class UserResponseDto {
+public class UserDto {
     private Long id;
     private String fullName;
     private String email;
     private String role;
 
-    public UserResponseDto(User user) {
-        this.id = user.getId().longValue();
+    public UserDto(User user) {
+        this.id = user.getId();
         this.fullName = user.getFullName();
         this.email = user.getEmail();
-        this.role = user.getRole().getDescription();
+        this.role = user.getRole().getName();
     }
 }

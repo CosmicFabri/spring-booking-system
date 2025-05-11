@@ -21,7 +21,6 @@ public class SpaceController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('admin')")
     public ResponseEntity<List<Space>> getSpaces() {
         List<Space> spaces = spaceService.getAllSpaces();
 
@@ -29,7 +28,6 @@ public class SpaceController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('admin')")
     public ResponseEntity<Space> getSpaceById(@PathVariable Long id) {
         Space space = spaceService.getSpaceById(id);
 
