@@ -3,20 +3,22 @@ package com.spring.spring_booking_system.controllers;
 import com.spring.spring_booking_system.dtos.requests.BookingRequest;
 import com.spring.spring_booking_system.dtos.responses.BookingResponse;
 import com.spring.spring_booking_system.entities.Booking;
-import com.spring.spring_booking_system.entities.User;
 import com.spring.spring_booking_system.services.BookingService;
 import com.spring.spring_booking_system.services.SpaceService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
-@Controller
+@RestController
 @RequestMapping("/bookings")
 public class BookingController {
     private final BookingService bookingService;
@@ -45,19 +47,19 @@ public class BookingController {
 
     @GetMapping("/user")
     @PreAuthorize("hasRole('user')")
-    public ResponseEntity<List<BookingResponse>> getUserBookings() {
-        // Get the ID of the authenticated user
-        Long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    public Page<BookingResponse> getUserBookings(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "true") boolean ascending
+    ) {
+        Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
 
-        // Get all the bookings by userId
-        List<Booking> bookings = bookingService.findAllByUserId(userId);
-        List<BookingResponse> bookingsResponse = new ArrayList<>();
+        Page<Booking> bookingsPage = bookingService.findAll(pageable);
 
-        for (Booking booking : bookings) {
-            bookingsResponse.add(new BookingResponse(booking));
-        }
-
-        return new ResponseEntity<>(bookingsResponse, HttpStatus.OK);
+        // Map each Booking to a BookingResponse
+        return bookingsPage.map(BookingResponse::new);
     }
 
     @GetMapping("/{id}")
