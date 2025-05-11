@@ -5,6 +5,7 @@ import com.spring.spring_booking_system.dtos.responses.BookingResponse;
 import com.spring.spring_booking_system.entities.Booking;
 import com.spring.spring_booking_system.entities.Space;
 import com.spring.spring_booking_system.entities.User;
+import com.spring.spring_booking_system.repositories.BookingRepository;
 import com.spring.spring_booking_system.services.BookingService;
 import com.spring.spring_booking_system.services.SpaceService;
 import com.spring.spring_booking_system.repositories.UserRepository;
@@ -27,8 +28,7 @@ public class BookingController {
 
     public BookingController(
             BookingService bookingService,
-            SpaceService spaceService
-    ) {
+            SpaceService spaceService) {
         this.bookingService = bookingService;
         this.spaceService = spaceService;
     }
@@ -56,7 +56,35 @@ public class BookingController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
+        // USER SCOPE
+        String role = "" + SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+        if (role.equals("[ROLE_user]")) {
+            Long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+            // Get the user ID related to the booking ID of the request
+            User user = bookingService.findById(id).getUser();
+            Long requestUserId = user.getId();
+
+            if (!userId.equals(requestUserId)) {
+                //response.put("error", "You can't retrieve other's booking.");
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
+        }
+
+        // ADMIN SCOPE
         return ResponseEntity.ok(new BookingResponse(booking));
+    }
+
+    @GetMapping("/user/pending")
+    public ResponseEntity<List<BookingResponse>> getPendingBookings() {
+        Long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        List<Booking> bookings = bookingService.getPendingUserBookings(userId);
+        List<BookingResponse> bookingResponses = new ArrayList<>();
+        for (Booking booking : bookings) {
+            bookingResponses.add(new BookingResponse(booking));
+        }
+
+        return ResponseEntity.ok(bookingResponses);
     }
 
     @PostMapping

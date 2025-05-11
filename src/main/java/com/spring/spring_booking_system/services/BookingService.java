@@ -88,6 +88,10 @@ public class BookingService {
         return null;
     }
 
+    public List<Booking> getPendingUserBookings(Long userId) {
+        return bookingRepository.findByUserPending(LocalDate.now(), LocalTime.now(), userId);
+    }
+
     // Checks if the booking time interval doesn't overlap with another one
     public boolean isBookingUnique(BookingRequest request, Optional<Booking> booking) {
         LocalDate date = request.getDay();
