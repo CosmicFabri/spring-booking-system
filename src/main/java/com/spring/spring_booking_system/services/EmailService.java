@@ -55,9 +55,9 @@ public class EmailService {
             """,
                     user.getFullName(),
                     spaceName,
-                    booking.getDate(),
-                    booking.getStartTime(),
-                    booking.getEndTime()
+                    booking.getDay(),
+                    booking.getStartHour(),
+                    booking.getEndHour()
             );
 
             helper.setText(htmlMsg, true);
@@ -95,9 +95,9 @@ public class EmailService {
             """,
                     user.getFullName(),
                     spaceName,
-                    booking.getDate(),
-                    booking.getStartTime(),
-                    booking.getEndTime()
+                    booking.getDay(),
+                    booking.getStartHour(),
+                    booking.getEndHour()
             );
 
             helper.setText(htmlMsg, true);

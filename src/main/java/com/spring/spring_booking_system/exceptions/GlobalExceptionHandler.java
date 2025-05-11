@@ -1,6 +1,7 @@
 package com.spring.spring_booking_system.exceptions;
 
 import com.spring.spring_booking_system.responses.ErrorResponse;
+import org.apache.coyote.Response;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +29,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleRoleNotFound(RoleNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new ErrorResponse("Role not found"));
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleUserNotFound(UserNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ErrorResponse(ex.getMessage()));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
@@ -81,11 +88,5 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleEmailException(EmailSendingException ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ErrorResponse("An error occurred while sending an email"));
-    }
-
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleUserNotFound(UserNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new ErrorResponse(ex.getMessage()));
     }
 }

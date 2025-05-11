@@ -27,7 +27,7 @@ public class BookingReminderService {
         LocalDate tomorrow = today.plusDays(1);
         LocalTime currentHour = LocalTime.now().withNano(0);
 
-        List<Booking> bookings = bookingRepository.findByDateAndStartTime(tomorrow, currentHour);
+        List<Booking> bookings = bookingRepository.findByDateAndStartHour(tomorrow, currentHour);
 
         for (Booking booking : bookings) {
             String spaceName = booking.getSpace().getName();
