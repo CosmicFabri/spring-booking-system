@@ -11,6 +11,6 @@ import java.util.List;
 public interface BookingRepository extends JpaRepository<Booking, Integer> {
     List<Booking> findAllByDayAndSpace_Id(LocalDate day, Long spaceId);
 
-    List<Booking> findByDateAndStartHour(LocalDate date, LocalTime startHour);
+    List<Booking> findByDayAndStartHour(LocalDate date, LocalTime startHour);
 
 }
