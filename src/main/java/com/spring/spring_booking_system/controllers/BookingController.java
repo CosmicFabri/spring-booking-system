@@ -3,13 +3,9 @@ package com.spring.spring_booking_system.controllers;
 import com.spring.spring_booking_system.dtos.requests.BookingRequest;
 import com.spring.spring_booking_system.dtos.responses.BookingResponse;
 import com.spring.spring_booking_system.entities.Booking;
-import com.spring.spring_booking_system.entities.Space;
 import com.spring.spring_booking_system.entities.User;
-import com.spring.spring_booking_system.repositories.BookingRepository;
 import com.spring.spring_booking_system.services.BookingService;
 import com.spring.spring_booking_system.services.SpaceService;
-import com.spring.spring_booking_system.repositories.UserRepository;
-import com.spring.spring_booking_system.services.BookingService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -60,10 +56,10 @@ public class BookingController {
 
         // Get all the bookings by userId
         List<Booking> bookings = bookingService.findAllByUserId(userId);
-        List<BookingResponseDto> bookingResponseDtos = new ArrayList<>();
+        List<BookingResponse> bookingResponseDtos = new ArrayList<>();
 
         for (Booking booking : bookings) {
-            bookingResponseDtos.add(new BookingResponseDto(booking));
+            bookingResponseDtos.add(new BookingResponse(booking));
         }
 
         response.put("message", "Bookings retrieved correctly.");
