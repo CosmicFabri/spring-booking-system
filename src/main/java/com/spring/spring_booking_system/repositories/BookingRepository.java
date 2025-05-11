@@ -16,5 +16,4 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
 
     @Query("SELECT b FROM Booking b WHERE b.user.id = :userId AND b.day > :day OR (b.day = :day AND b.startHour > :startHour)")
     List<Booking> findByUserPending(LocalDate day, LocalTime startHour, Long userId);
-
 }

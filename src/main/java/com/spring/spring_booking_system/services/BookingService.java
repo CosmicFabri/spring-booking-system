@@ -53,8 +53,12 @@ public class BookingService {
     }
 
     public List<Booking> findAll() {
+        return new ArrayList<>(bookingRepository.findAll());
+    }
+
+    public List<Booking> findAllByUserId(Integer id) {
         List<Booking> bookings = new ArrayList<>();
-        bookingRepository.findAll().forEach(bookings::add);
+        bookings = bookingRepository.findAllByUser_Id(id);
 
         return bookings;
     }
