@@ -169,28 +169,24 @@ public class BookingController {
             response.put("booking", new BookingResponse(booking));
 
             return ResponseEntity.ok(response);
-        } else if (role.equals("[ROLE_user]")) {
-            Long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-            // Get the user ID related to the booking ID of the request
-            User user = bookingService.findById(id).getUser();
-            Long requestUserId = user.getId();
-
-            if (!userId.equals(requestUserId)) {
-                response.put("error", "You can't delete other's booking.");
-
-                return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
-            }
-
-            booking = bookingService.delete(id);
-
-            response.put("message", "Booking deleted successfully.");
-            response.put("booking", new BookingResponse(booking));
-
-            return ResponseEntity.ok(response);
         }
 
-        response.put("error", "Role not authorized for this operation.");
-        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+        Long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        // Get the user ID related to the booking ID of the request
+        Long requestUserId = bookingService.findById(id).getUser().getId();
+
+        if (!userId.equals(requestUserId)) {
+            response.put("error", "User ID does not match.");
+
+            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+        }
+
+        booking = bookingService.delete(id);
+
+        response.put("message", "Booking deleted successfully.");
+        response.put("booking", new BookingResponse(booking));
+
+        return ResponseEntity.ok(response);
     }
 }
