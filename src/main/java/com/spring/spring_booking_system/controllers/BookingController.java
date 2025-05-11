@@ -45,27 +45,19 @@ public class BookingController {
 
     @GetMapping("/user")
     @PreAuthorize("hasRole('user')")
-    public ResponseEntity<Map<String, Object>> getUserBookings() {
+    public ResponseEntity<List<BookingResponse>> getUserBookings() {
         // Get the ID of the authenticated user
-        Integer userId = (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        // Error: no user authenticated
-        if (userId == null) {
-            response.put("error", "No user authenticated.");
-        }
+        Long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         // Get all the bookings by userId
         List<Booking> bookings = bookingService.findAllByUserId(userId);
-        List<BookingResponse> bookingResponseDtos = new ArrayList<>();
+        List<BookingResponse> bookingsResponse = new ArrayList<>();
 
         for (Booking booking : bookings) {
-            bookingResponseDtos.add(new BookingResponse(booking));
+            bookingsResponse.add(new BookingResponse(booking));
         }
 
-        response.put("message", "Bookings retrieved correctly.");
-        response.put("bookings", bookingResponseDtos);
-
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return new ResponseEntity<>(bookingsResponse, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
@@ -83,8 +75,7 @@ public class BookingController {
             Long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
             // Get the user ID related to the booking ID of the request
-            User user = bookingService.findById(id).getUser();
-            Long requestUserId = user.getId();
+            Long requestUserId = bookingService.findById(id).getUser().getId();
 
             if (!userId.equals(requestUserId)) {
                 //response.put("error", "You can't retrieve other's booking.");

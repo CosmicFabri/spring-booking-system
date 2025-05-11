@@ -56,7 +56,7 @@ public class BookingService {
         return new ArrayList<>(bookingRepository.findAll());
     }
 
-    public List<Booking> findAllByUserId(Integer id) {
+    public List<Booking> findAllByUserId(Long id) {
         List<Booking> bookings = new ArrayList<>();
         bookings = bookingRepository.findAllByUser_Id(id);
 
