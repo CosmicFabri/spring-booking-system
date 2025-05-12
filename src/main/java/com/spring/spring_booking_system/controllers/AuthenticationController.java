@@ -51,7 +51,6 @@ public class AuthenticationController {
     @PostMapping("/login/google")
     public ResponseEntity<LoginResponse> googleLogin(@Valid @RequestBody LoginGoogleRequest loginGoogleRequest) {
         String googleToken = loginGoogleRequest.googleToken;
-        System.out.println(googleToken);
 
         User loggedUser = authenticationService.authenticateWithGoogleToken(googleToken);
 

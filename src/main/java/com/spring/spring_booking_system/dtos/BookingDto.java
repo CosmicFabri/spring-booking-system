@@ -30,9 +30,11 @@ public class BookingDto {
     private String userName;
 
     @JsonProperty("start_hour")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
     private LocalTime startHour;
 
     @JsonProperty("end_hour")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
     private LocalTime endHour;
 
     private boolean editable;

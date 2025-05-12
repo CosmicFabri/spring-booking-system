@@ -36,16 +36,21 @@ public class BookingController {
         this.spaceService = spaceService;
     }
 
-    @GetMapping("/all")
+    @GetMapping
     @PreAuthorize("hasRole('admin')")
-    public ResponseEntity<List<BookingResponse>> getAllBookings() {
-        List<Booking> bookings = bookingService.findAll();
-        List<BookingResponse> bookingResponses = new ArrayList<>();
-        for (Booking booking : bookings) {
-            bookingResponses.add(new BookingResponse(booking));
-        }
+    public Page<BookingDto> getAllBookings(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "8") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "false") boolean ascending
+    ) {
+        Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
 
-        return ResponseEntity.ok(bookingResponses);
+        Page<Booking> bookingsPage = bookingService.findAll(pageable);
+
+        // Map each Booking to a BookingResponse
+        return bookingsPage.map(BookingDto::new);
     }
 
     @GetMapping("/day/{day}")
@@ -62,19 +67,21 @@ public class BookingController {
     // getUserBookings
     @GetMapping("/user")
     @PreAuthorize("hasRole('user')")
-    public Page<BookingResponse> getUserBookings(
+    public Page<BookingDto> getUserBookings(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "8") int size,
             @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "true") boolean ascending
+            @RequestParam(defaultValue = "false") boolean ascending
     ) {
+        Long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
         Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        Page<Booking> bookingsPage = bookingService.findAll(pageable);
+        Page<Booking> bookingsPage = bookingService.findAllByUserId(userId, pageable);
 
         // Map each Booking to a BookingResponse
-        return bookingsPage.map(BookingResponse::new);
+        return bookingsPage.map(BookingDto::new);
     }
 
     @GetMapping("/{id}")

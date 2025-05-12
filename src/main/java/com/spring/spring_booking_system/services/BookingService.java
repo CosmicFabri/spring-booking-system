@@ -63,11 +63,9 @@ public class BookingService {
         return bookingRepository.findAll(pageable);
     }
 
-    public List<Booking> findAllByUserId(Long id) {
-        List<Booking> bookings = new ArrayList<>();
-        bookings = bookingRepository.findAllByUser_Id(id);
+    public Page<Booking> findAllByUserId(Long id, Pageable pageable) {
 
-        return bookings;
+        return bookingRepository.findAllByUser_Id(id, pageable);
     }
 
 
