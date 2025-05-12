@@ -8,12 +8,19 @@ import com.spring.spring_booking_system.entities.User;
 import com.spring.spring_booking_system.dtos.responses.LoginResponse;
 import com.spring.spring_booking_system.services.AuthenticationService;
 import com.spring.spring_booking_system.services.JwtService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.util.Map;
 
 @Controller
 @RequestMapping("/auth")
@@ -62,5 +69,14 @@ public class AuthenticationController {
         loginResponse.setUser(new UserDto(loggedUser));
 
         return ResponseEntity.ok(loginResponse);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@NonNull HttpServletRequest request) {
+        final String authHeader = request.getHeader("Authorization");
+
+        final String jwt = authHeader.substring(7);
+
+        return ResponseEntity.ok().body(Map.of("token", jwt));
     }
 }

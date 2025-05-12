@@ -90,5 +90,9 @@ public class AuthenticationService {
                 .orElseThrow();
     }
 
+    public String logout(String token) {
+        return "Bearer " + token;
+    }
+
 
 }
