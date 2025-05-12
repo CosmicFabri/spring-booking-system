@@ -8,6 +8,7 @@ import com.spring.spring_booking_system.entities.User;
 import com.spring.spring_booking_system.dtos.responses.LoginResponse;
 import com.spring.spring_booking_system.services.AuthenticationService;
 import com.spring.spring_booking_system.services.JwtService;
+import com.spring.spring_booking_system.services.TokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -25,15 +26,18 @@ import java.util.Map;
 @Controller
 @RequestMapping("/auth")
 public class AuthenticationController {
-    private JwtService jwtService;
-    private AuthenticationService authenticationService;
+    private final JwtService jwtService;
+    private final AuthenticationService authenticationService;
+    private TokenService tokenService;
 
     public AuthenticationController(
             JwtService jwtService,
-            AuthenticationService authenticationService
+            AuthenticationService authenticationService,
+            TokenService tokenService
     ) {
         this.jwtService = jwtService;
         this.authenticationService = authenticationService;
+        this.tokenService = tokenService;
     }
 
     @PostMapping("/signup")
@@ -47,7 +51,6 @@ public class AuthenticationController {
         User loggedUser = authenticationService.authenticate(loginRequest);
         String jwtToken = jwtService.generateToken(loggedUser);
         LoginResponse loginResponse = new LoginResponse();
-
         loginResponse.setToken(jwtToken);
         loginResponse.setExpiresIn(jwtService.getExpirationTime());
         loginResponse.setUser(new UserDto(loggedUser));
@@ -68,6 +71,7 @@ public class AuthenticationController {
         loginResponse.setExpiresIn(jwtService.getExpirationTime());
         loginResponse.setUser(new UserDto(loggedUser));
 
+
         return ResponseEntity.ok(loginResponse);
     }
 
@@ -76,6 +80,8 @@ public class AuthenticationController {
         final String authHeader = request.getHeader("Authorization");
 
         final String jwt = authHeader.substring(7);
+
+        tokenService.revokeToken(jwt);
 
         return ResponseEntity.ok().body(Map.of("token", jwt));
     }
