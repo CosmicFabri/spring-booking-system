@@ -11,6 +11,7 @@ import com.spring.spring_booking_system.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,6 +60,11 @@ public class BookingService {
         return bookings;
     }
 
+
+    public List<Booking> findFiltered(LocalDate day) {
+        return bookingRepository.findAllByDay(day);
+    }
+
     public Booking findById(int id) {
         return bookingRepository.findById(id).orElse(null);
     }
@@ -66,7 +72,12 @@ public class BookingService {
     public Booking update(int id, BookingRequest booking) {
         Booking updatedBooking = bookingRepository.findById(id).orElse(null);
 
+
         if (updatedBooking != null) {
+            Space space = spaceRepository.findById(booking.getIdSpace()).orElse(updatedBooking.getSpace());
+
+            updatedBooking.setSpace(space);
+            updatedBooking.setDay(booking.getDay());
             updatedBooking.setStartHour(booking.getStartHour());
             updatedBooking.setEndHour(booking.getEndHour());
 
@@ -90,6 +101,16 @@ public class BookingService {
 
     public List<Booking> getPendingUserBookings(Long userId) {
         return bookingRepository.findByUserPending(LocalDate.now(), LocalTime.now(), userId);
+    }
+
+    public List<Booking> getScheduledBookings(Long spaceId, LocalDate day, Long bookingId) {
+        if(bookingId == null) {
+            return bookingRepository.findAllByDayAndSpace_Id(day, spaceId);
+        }
+        else {
+            return bookingRepository.findAllByDayAndSpace_IdAndIdNot(day, spaceId, bookingId);
+        }
+
     }
 
     // Checks if the booking time interval doesn't overlap with another one
@@ -121,5 +142,12 @@ public class BookingService {
         }
 
         return true;
+    }
+
+    public static boolean isEditable(Booking booking) {
+        LocalDateTime targetTime = LocalDateTime.now().plusDays(1);
+        LocalDateTime bookingTime = LocalDateTime.of(booking.getDay(), booking.getStartHour());
+
+        return targetTime.isBefore(bookingTime);
     }
 }

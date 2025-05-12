@@ -1,5 +1,6 @@
 package com.spring.spring_booking_system.controllers;
 
+import com.spring.spring_booking_system.dtos.BookingDto;
 import com.spring.spring_booking_system.dtos.requests.BookingRequest;
 import com.spring.spring_booking_system.dtos.responses.BookingResponse;
 import com.spring.spring_booking_system.entities.Booking;
@@ -18,6 +19,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.*;
 
 @Controller
@@ -45,11 +48,22 @@ public class BookingController {
         return ResponseEntity.ok(bookingResponses);
     }
 
+    @GetMapping("/day/{day}")
+    public ResponseEntity<List<BookingDto>> addBooking(@PathVariable LocalDate day) {
+        List<Booking> bookings = bookingService.findFiltered(day);
+        List<BookingDto> bookingsDto = new ArrayList<>();
+        for (Booking booking : bookings) {
+            bookingsDto.add(new BookingDto(booking));
+        }
+
+        return ResponseEntity.ok(bookingsDto);
+    }
+
     // getUserBookings
 
     @GetMapping("/{id}")
     //@PreAuthorize("hasRole('admin')")
-    public ResponseEntity<BookingResponse> getBookingById(@PathVariable int id) {
+    public ResponseEntity<BookingDto> getBookingById(@PathVariable int id) {
         Booking booking = bookingService.findById(id);
 
         if (booking == null) {
@@ -72,16 +86,32 @@ public class BookingController {
         }
 
         // ADMIN SCOPE
-        return ResponseEntity.ok(new BookingResponse(booking));
+        return ResponseEntity.ok(new BookingDto(booking));
     }
 
+    @GetMapping("/hours")
+    public ResponseEntity<List<BookingDto>> getScheduledBookings(
+            @RequestParam Long idSpace,
+            @RequestParam LocalDate day,
+            @RequestParam(required = false) Long idBooking ) {
+
+        List<Booking> bookings = bookingService.getScheduledBookings(idSpace, day, idBooking);
+        List<BookingDto> bookingDtos = new ArrayList<>();
+        for (Booking booking : bookings) {
+            bookingDtos.add(new BookingDto(booking));
+        }
+
+        return ResponseEntity.ok(bookingDtos);
+    }
+
+
     @GetMapping("/user/pending")
-    public ResponseEntity<List<BookingResponse>> getPendingBookings() {
+    public ResponseEntity<List<BookingDto>> getPendingBookings() {
         Long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         List<Booking> bookings = bookingService.getPendingUserBookings(userId);
-        List<BookingResponse> bookingResponses = new ArrayList<>();
+        List<BookingDto> bookingResponses = new ArrayList<>();
         for (Booking booking : bookings) {
-            bookingResponses.add(new BookingResponse(booking));
+            bookingResponses.add(new BookingDto(booking));
         }
 
         return ResponseEntity.ok(bookingResponses);
@@ -89,7 +119,7 @@ public class BookingController {
 
     @PostMapping
     @PreAuthorize("hasRole('user')")
-    public ResponseEntity<BookingResponse> createBooking(@Valid @RequestBody BookingRequest request) {
+    public ResponseEntity<BookingDto> createBooking(@Valid @RequestBody BookingRequest request) {
         // Get the ID of the authenticated user
         Long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
@@ -97,7 +127,7 @@ public class BookingController {
             request.setIdUser(userId);
             Booking bookingCreated = bookingService.save(request);
 
-            return ResponseEntity.ok(new BookingResponse(bookingCreated));
+            return ResponseEntity.ok(new BookingDto(bookingCreated));
         }
 
         // Error: there has been a conflict with the requested booking interval

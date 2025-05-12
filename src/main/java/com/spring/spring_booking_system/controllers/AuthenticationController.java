@@ -49,7 +49,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login/google")
-    public ResponseEntity<LoginResponse> googleLogin(@RequestBody LoginGoogleRequest loginGoogleRequest) {
+    public ResponseEntity<LoginResponse> googleLogin(@Valid @RequestBody LoginGoogleRequest loginGoogleRequest) {
         String googleToken = loginGoogleRequest.googleToken;
         System.out.println(googleToken);
 

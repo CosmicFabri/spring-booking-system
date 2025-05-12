@@ -1,6 +1,7 @@
 package com.spring.spring_booking_system.controllers;
 
 import com.spring.spring_booking_system.dtos.SpaceDto;
+import com.spring.spring_booking_system.dtos.requests.SpaceRequest;
 import com.spring.spring_booking_system.entities.Space;
 import com.spring.spring_booking_system.services.SpaceService;
 import jakarta.validation.Valid;
@@ -45,7 +46,7 @@ public class SpaceController {
 
     @PostMapping
     @PreAuthorize("hasRole('admin')")
-    public ResponseEntity<SpaceDto> addSpace(@Valid @RequestBody Space space) {
+    public ResponseEntity<SpaceDto> addSpace(@Valid @RequestBody SpaceRequest space) {
         Space newSpace = spaceService.addSpace(space);
 
         return new ResponseEntity<>(new SpaceDto(newSpace), HttpStatus.CREATED);

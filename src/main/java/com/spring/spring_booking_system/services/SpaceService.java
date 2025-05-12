@@ -1,5 +1,6 @@
 package com.spring.spring_booking_system.services;
 
+import com.spring.spring_booking_system.dtos.requests.SpaceRequest;
 import com.spring.spring_booking_system.entities.Space;
 import com.spring.spring_booking_system.repositories.SpaceRepository;
 import org.springframework.stereotype.Service;
@@ -26,8 +27,15 @@ public class SpaceService {
         return spaceRepository.findById(id).orElse(null);
     }
 
-    public Space addSpace(Space space) {
-        return spaceRepository.save(space);
+    public Space addSpace(SpaceRequest spaceRequest) {
+        Space newSpace = new Space();
+        newSpace.setName(spaceRequest.getName());
+        newSpace.setCapacity(spaceRequest.getCapacity());
+        newSpace.setDescription(spaceRequest.getDescription());
+        newSpace.setDisponibilityStart(spaceRequest.getDisponibilityStart());
+        newSpace.setDisponibilityEnd(spaceRequest.getDisponibilityEnd());
+
+        return spaceRepository.save(newSpace);
     }
 
     public Space updateSpace(Long id, Space space) {

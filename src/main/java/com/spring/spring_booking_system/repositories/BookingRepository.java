@@ -1,6 +1,8 @@
 package com.spring.spring_booking_system.repositories;
 
 import com.spring.spring_booking_system.entities.Booking;
+import com.spring.spring_booking_system.entities.Space;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -10,7 +12,11 @@ import java.util.List;
 
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Integer> {
+    List<Booking> findAllByDay(LocalDate day);
+
     List<Booking> findAllByDayAndSpace_Id(LocalDate day, Long spaceId);
+
+    List<Booking> findAllByDayAndSpace_IdAndIdNot(LocalDate day, Long spaceId, Long id);
 
     List<Booking> findByDayAndStartHour(LocalDate date, LocalTime startHour);
 
