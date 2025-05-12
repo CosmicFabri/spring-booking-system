@@ -5,7 +5,7 @@ import com.spring.spring_booking_system.dtos.requests.LoginRequest;
 import com.spring.spring_booking_system.dtos.requests.RegisterRequest;
 import com.spring.spring_booking_system.dtos.UserDto;
 import com.spring.spring_booking_system.entities.User;
-import com.spring.spring_booking_system.responses.LoginResponse;
+import com.spring.spring_booking_system.dtos.responses.LoginResponse;
 import com.spring.spring_booking_system.services.AuthenticationService;
 import com.spring.spring_booking_system.services.JwtService;
 import jakarta.validation.Valid;
@@ -43,6 +43,7 @@ public class AuthenticationController {
 
         loginResponse.setToken(jwtToken);
         loginResponse.setExpiresIn(jwtService.getExpirationTime());
+        loginResponse.setUser(new UserDto(loggedUser));
 
         return ResponseEntity.ok(loginResponse);
     }
@@ -50,6 +51,8 @@ public class AuthenticationController {
     @PostMapping("/login/google")
     public ResponseEntity<LoginResponse> googleLogin(@RequestBody LoginGoogleRequest loginGoogleRequest) {
         String googleToken = loginGoogleRequest.googleToken;
+        System.out.println(googleToken);
+
         User loggedUser = authenticationService.authenticateWithGoogleToken(googleToken);
 
         String jwtToken = jwtService.generateToken(loggedUser);
@@ -57,6 +60,8 @@ public class AuthenticationController {
 
         loginResponse.setToken(jwtToken);
         loginResponse.setExpiresIn(jwtService.getExpirationTime());
+        loginResponse.setUser(new UserDto(loggedUser));
+
         return ResponseEntity.ok(loginResponse);
     }
 }

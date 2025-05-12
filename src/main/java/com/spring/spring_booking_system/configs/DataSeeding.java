@@ -65,12 +65,13 @@ public class DataSeeding implements CommandLineRunner {
 
     public void seedUsers() {
         if (userRepository.count() == 0) {
-            Role role =  roleRepository.findById(1L).orElse(null); //"user"
+            Role role =  roleRepository.findById(1L).orElse(null); //"admin"
             User admin = new User();
             admin.setRole(role);
             admin.setFullName("Admin");
             admin.setEmail("admin@uacam.mx");
             admin.setPassword(passwordEncoder.encode("password"));
+            userRepository.save(admin);
 
             List<User> users = List.of(
                     createUser("Alexis Perez", "al064601@uacam.mx"),

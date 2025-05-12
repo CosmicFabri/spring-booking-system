@@ -4,6 +4,7 @@ import com.spring.spring_booking_system.dtos.requests.LoginRequest;
 import com.spring.spring_booking_system.dtos.requests.RegisterRequest;
 import com.spring.spring_booking_system.entities.Role;
 import com.spring.spring_booking_system.entities.User;
+import com.spring.spring_booking_system.exceptions.UserNotFoundException;
 import com.spring.spring_booking_system.repositories.RoleRepository;
 import com.spring.spring_booking_system.repositories.UserRepository;
 import com.spring.spring_booking_system.exceptions.RoleNotFoundException;
@@ -61,7 +62,7 @@ public class AuthenticationService {
         );
 
         return userRepository.findByEmail(input.getEmail())
-                .orElseThrow();
+                .orElseThrow(() -> new UserNotFoundException());
     }
 
     public User authenticateWithGoogleToken(String googleToken) {
