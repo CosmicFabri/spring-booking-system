@@ -39,19 +39,6 @@ public class AuthenticationService {
         this.authenticationManager = authenticationManager;
     }
 
-    public User signup(RegisterRequest input) {
-        User user = new User();
-
-        Role role = roleRepository.findById(input.getRoleId())
-                .orElseThrow(() -> new RoleNotFoundException(input.getRoleId()));
-
-        user.setRole(role);
-        user.setFullName(input.getFullName());
-        user.setEmail(input.getEmail());
-        user.setPassword(passwordEncoder.encode(input.getPassword()));
-
-        return userRepository.save(user);
-    }
 
     public User authenticate(LoginRequest input) {
         authenticationManager.authenticate(
@@ -89,10 +76,5 @@ public class AuthenticationService {
         return userRepository.findByEmail(email)
                 .orElseThrow();
     }
-
-    public String logout(String token) {
-        return "Bearer " + token;
-    }
-
 
 }

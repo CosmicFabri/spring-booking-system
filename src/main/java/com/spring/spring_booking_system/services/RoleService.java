@@ -12,6 +12,10 @@ public class RoleService {
         this.roleRepository = roleRepository;
     }
 
+    public Role findByName(String name) {
+        return roleRepository.findByName(name);
+    }
+
     public Role findById(Long id) {
         return roleRepository.findById(id).orElse(null);
     }

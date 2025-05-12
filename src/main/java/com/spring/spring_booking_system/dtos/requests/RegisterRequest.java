@@ -1,5 +1,6 @@
 package com.spring.spring_booking_system.dtos.requests;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -10,10 +11,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class RegisterRequest {
-    @JsonProperty("idRole")
-    @NotNull(message = "Role ID is mandatory.")
-    private Long roleId;
-
     @NotBlank(message = "Email is mandatory.")
     @Email(message = "Email must be valid")
     private String email;
@@ -21,6 +18,7 @@ public class RegisterRequest {
     @NotBlank(message = "Password is mandatory.")
     private String password;
 
+    @JsonProperty("name")
     @NotBlank(message = "Full name is mandatory.")
     private String fullName;
 }

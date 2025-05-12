@@ -1,14 +1,13 @@
 package com.spring.spring_booking_system.controllers;
 
 import com.spring.spring_booking_system.dtos.UserDto;
+import com.spring.spring_booking_system.dtos.requests.RegisterRequest;
 import com.spring.spring_booking_system.entities.User;
 import com.spring.spring_booking_system.exceptions.UserNotFoundException;
 import com.spring.spring_booking_system.services.UserService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/user")
@@ -31,6 +30,12 @@ public class UserController {
             throw new UserNotFoundException();
         }
 
+        return new UserDto(user);
+    }
+
+    @PostMapping
+    public UserDto createUser(@RequestBody RegisterRequest request) {
+        User user = userService.register(request);
         return new UserDto(user);
     }
 
