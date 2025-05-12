@@ -4,30 +4,30 @@ import com.spring.spring_booking_system.dtos.BookingDto;
 import com.spring.spring_booking_system.dtos.requests.BookingRequest;
 import com.spring.spring_booking_system.dtos.responses.BookingResponse;
 import com.spring.spring_booking_system.entities.Booking;
-import com.spring.spring_booking_system.entities.Space;
-import com.spring.spring_booking_system.entities.User;
-import com.spring.spring_booking_system.repositories.BookingRepository;
 import com.spring.spring_booking_system.services.BookingService;
 import com.spring.spring_booking_system.services.SpaceService;
-import com.spring.spring_booking_system.repositories.UserRepository;
-import com.spring.spring_booking_system.services.BookingService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
 
-@Controller
+@RestController
 @RequestMapping("/bookings")
 public class BookingController {
     private final BookingService bookingService;
     private final SpaceService spaceService;
+
+    Map<String, Object> response = new HashMap<>();
 
     public BookingController(
             BookingService bookingService,
@@ -36,7 +36,7 @@ public class BookingController {
         this.spaceService = spaceService;
     }
 
-    @GetMapping
+    @GetMapping("/all")
     @PreAuthorize("hasRole('admin')")
     public ResponseEntity<List<BookingResponse>> getAllBookings() {
         List<Booking> bookings = bookingService.findAll();
@@ -60,6 +60,22 @@ public class BookingController {
     }
 
     // getUserBookings
+    @GetMapping("/user")
+    @PreAuthorize("hasRole('user')")
+    public Page<BookingResponse> getUserBookings(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "true") boolean ascending
+    ) {
+        Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<Booking> bookingsPage = bookingService.findAll(pageable);
+
+        // Map each Booking to a BookingResponse
+        return bookingsPage.map(BookingResponse::new);
+    }
 
     @GetMapping("/{id}")
     //@PreAuthorize("hasRole('admin')")
@@ -76,8 +92,7 @@ public class BookingController {
             Long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
             // Get the user ID related to the booking ID of the request
-            User user = bookingService.findById(id).getUser();
-            Long requestUserId = user.getId();
+            Long requestUserId = bookingService.findById(id).getUser().getId();
 
             if (!userId.equals(requestUserId)) {
                 //response.put("error", "You can't retrieve other's booking.");
@@ -170,7 +185,6 @@ public class BookingController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('user', 'admin')")
     public ResponseEntity<Map<String, Object>> deleteBooking(@PathVariable int id) {
-        Map<String, Object> response = new HashMap<>();
         Booking booking = bookingService.findById(id);
 
         if (booking == null) {
@@ -188,28 +202,24 @@ public class BookingController {
             response.put("booking", new BookingResponse(booking));
 
             return ResponseEntity.ok(response);
-        } else if (role.equals("[ROLE_user]")) {
-            Long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-            // Get the user ID related to the booking ID of the request
-            User user = bookingService.findById(id).getUser();
-            Long requestUserId = user.getId();
-
-            if (!userId.equals(requestUserId)) {
-                response.put("error", "You can't delete other's booking.");
-
-                return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
-            }
-
-            booking = bookingService.delete(id);
-
-            response.put("message", "Booking deleted successfully.");
-            response.put("booking", new BookingResponse(booking));
-
-            return ResponseEntity.ok(response);
         }
 
-        response.put("error", "Role not authorized for this operation.");
-        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+        Long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        // Get the user ID related to the booking ID of the request
+        Long requestUserId = bookingService.findById(id).getUser().getId();
+
+        if (!userId.equals(requestUserId)) {
+            response.put("error", "User ID does not match.");
+
+            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+        }
+
+        booking = bookingService.delete(id);
+
+        response.put("message", "Booking deleted successfully.");
+        response.put("booking", new BookingResponse(booking));
+
+        return ResponseEntity.ok(response);
     }
 }

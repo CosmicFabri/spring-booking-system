@@ -8,6 +8,8 @@ import com.spring.spring_booking_system.exceptions.UserNotFoundException;
 import com.spring.spring_booking_system.repositories.BookingRepository;
 import com.spring.spring_booking_system.repositories.SpaceRepository;
 import com.spring.spring_booking_system.repositories.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -54,8 +56,16 @@ public class BookingService {
     }
 
     public List<Booking> findAll() {
+        return new ArrayList<>(bookingRepository.findAll());
+    }
+
+    public Page<Booking> findAll(Pageable pageable) {
+        return bookingRepository.findAll(pageable);
+    }
+
+    public List<Booking> findAllByUserId(Long id) {
         List<Booking> bookings = new ArrayList<>();
-        bookingRepository.findAll().forEach(bookings::add);
+        bookings = bookingRepository.findAllByUser_Id(id);
 
         return bookings;
     }
