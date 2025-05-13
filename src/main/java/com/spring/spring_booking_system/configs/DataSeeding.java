@@ -3,10 +3,7 @@ package com.spring.spring_booking_system.configs;
 import com.spring.spring_booking_system.entities.Role;
 import com.spring.spring_booking_system.entities.Space;
 import com.spring.spring_booking_system.entities.User;
-import com.spring.spring_booking_system.repositories.BookingRepository;
-import com.spring.spring_booking_system.repositories.RoleRepository;
-import com.spring.spring_booking_system.repositories.SpaceRepository;
-import com.spring.spring_booking_system.repositories.UserRepository;
+import com.spring.spring_booking_system.repositories.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -16,18 +13,23 @@ import java.util.List;
 
 @Component
 public class DataSeeding implements CommandLineRunner {
-    RoleRepository roleRepository;
-    UserRepository userRepository;
-    SpaceRepository spaceRepository;
-    PasswordEncoder passwordEncoder;
-    BookingRepository bookingRepository;
+    private final RoleRepository roleRepository;
+    private final UserRepository userRepository;
+    private final SpaceRepository spaceRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final BookingRepository bookingRepository;
+    private final ProgramRepository programRepository;
+    private final SubjectRepository subjectRepository;
 
-    public DataSeeding(RoleRepository roleRepository, UserRepository userRepository, SpaceRepository spaceRepository, PasswordEncoder passwordEncoder, BookingRepository bookingRepository) {
+    public DataSeeding(RoleRepository roleRepository, UserRepository userRepository, SpaceRepository spaceRepository, PasswordEncoder passwordEncoder,
+                       BookingRepository bookingRepository, ProgramRepository programRepository, SubjectRepository subjectRepository) {
         this.roleRepository = roleRepository;
         this.userRepository = userRepository;
         this.spaceRepository = spaceRepository;
         this.bookingRepository = bookingRepository;
         this.passwordEncoder = passwordEncoder;
+        this.programRepository = programRepository;
+        this.subjectRepository = subjectRepository;
     }
 
     @Override
@@ -80,6 +82,10 @@ public class DataSeeding implements CommandLineRunner {
             );
             userRepository.saveAll(users);
         }
+    }
+
+    public void seedProgramsAndSubjects() {
+        
     }
 
     private Space createSpace(String name, String description, int capacity) {
