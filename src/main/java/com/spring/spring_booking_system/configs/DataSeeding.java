@@ -85,7 +85,7 @@ public class DataSeeding implements CommandLineRunner {
     }
 
     public void seedProgramsAndSubjects() {
-        
+
     }
 
     private Space createSpace(String name, String description, int capacity) {
