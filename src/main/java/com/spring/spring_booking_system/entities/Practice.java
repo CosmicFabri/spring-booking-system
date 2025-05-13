@@ -23,11 +23,13 @@ public class Practice {
 
     @ManyToOne
     @NotNull
-    @JoinColumn(name = "id_subject", referencedColumnName = "id") // Puede ser null
+    @JoinColumn(name = "id_subject", referencedColumnName = "id")
+    // Can be null
     private Subject subject;
 
     @OneToOne(cascade = CascadeType.REMOVE, orphanRemoval = true)
-    @JoinColumn(name = "file", referencedColumnName = "id") // Puede ser null
+    @JoinColumn(name = "file", referencedColumnName = "id")
+    // Can be null
     private FileData file;
 
     @CreationTimestamp

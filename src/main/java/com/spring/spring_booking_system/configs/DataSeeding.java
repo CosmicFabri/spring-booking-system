@@ -18,9 +18,10 @@ public class DataSeeding implements CommandLineRunner {
     private final BookingRepository bookingRepository;
     private final ProgramRepository programRepository;
     private final SubjectRepository subjectRepository;
+    private final PracticeRepository practiceRepository;
 
     public DataSeeding(RoleRepository roleRepository, UserRepository userRepository, SpaceRepository spaceRepository, PasswordEncoder passwordEncoder,
-                       BookingRepository bookingRepository, ProgramRepository programRepository, SubjectRepository subjectRepository) {
+                       BookingRepository bookingRepository, ProgramRepository programRepository, SubjectRepository subjectRepository, PracticeRepository practiceRepository) {
         this.roleRepository = roleRepository;
         this.userRepository = userRepository;
         this.spaceRepository = spaceRepository;
@@ -28,6 +29,7 @@ public class DataSeeding implements CommandLineRunner {
         this.passwordEncoder = passwordEncoder;
         this.programRepository = programRepository;
         this.subjectRepository = subjectRepository;
+        this.practiceRepository = practiceRepository;
     }
 
     @Override
@@ -36,6 +38,7 @@ public class DataSeeding implements CommandLineRunner {
         seedSpaces();
         seedUsers();
         seedProgramsAndSubjects();
+        seedPractices();
     }
 
     public void seedRoles() {
@@ -66,7 +69,7 @@ public class DataSeeding implements CommandLineRunner {
 
     public void seedUsers() {
         if (userRepository.count() == 0) {
-            Role role =  roleRepository.findById(1L).orElse(null); //"admin"
+            Role role = roleRepository.findById(1L).orElse(null); //"admin"
             User admin = new User();
             admin.setRole(role);
             admin.setFullName("Admin");
@@ -99,10 +102,35 @@ public class DataSeeding implements CommandLineRunner {
                     createSubject("Programación web", programRepository.findByName("ITS")),
                     createSubject("Desarrollo de aplicaciones móviles", programRepository.findByName("ITS")),
                     createSubject("Redes de computadoras", programRepository.findByName("ISC"))
-                    );
+            );
 
             subjectRepository.saveAll(subjects);
         }
+    }
+
+    public void seedPractices() {
+        if (practiceRepository.count() == 0) {
+            Subject web = subjectRepository.findByName("Programación web");
+
+            List<Practice> practices = List.of(
+                    createPractice("Intro a PHP", web),
+                    createPractice("Buscaminas", web),
+                    createPractice("Intro a Jakarta", web),
+                    createPractice("Login", web),
+                    createPractice("Spring Boot", web),
+                    createPractice("App OpenWeather", subjectRepository.findByName("Desarrollo de aplicaciones móviles")),
+                    createPractice("Switching", subjectRepository.findByName("Redes de computadoras"))
+            );
+
+            practiceRepository.saveAll(practices);
+        }
+    }
+
+    private Practice createPractice(String name, Subject subject) {
+        Practice practice = new Practice();
+        practice.setName(name);
+        practice.setSubject(subject);
+        return practice;
     }
 
     private Subject createSubject(String name, Program program) {
@@ -129,7 +157,7 @@ public class DataSeeding implements CommandLineRunner {
     }
 
     private User createUser(String fullName, String email) {
-        Role role =  roleRepository.findById(2L).orElse(null); //"user"
+        Role role = roleRepository.findById(2L).orElse(null); //"user"
 
         User user = new User();
         user.setFullName(fullName);
