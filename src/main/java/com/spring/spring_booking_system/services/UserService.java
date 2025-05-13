@@ -42,7 +42,7 @@ public class UserService {
             throw new IllegalArgumentException("Email must be from @uacam.mx domain");
         }
 
-        if(userRepository.findByEmail(request.getEmail()).isEmpty()) {
+        if(userRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new IllegalArgumentException("Email already in use");
         }
 

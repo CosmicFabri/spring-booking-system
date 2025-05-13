@@ -75,7 +75,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
     public ResponseEntity<ErrorResponse> handleSQLIntegrityConstraintViolation(SQLIntegrityConstraintViolationException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(new ErrorResponse("Can't have two spaces with the same name"));
+                .body(new ErrorResponse(ex.getMessage()));
     }
 
     @ExceptionHandler(AccessDeniedException.class)
