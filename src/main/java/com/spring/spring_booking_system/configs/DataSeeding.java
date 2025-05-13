@@ -1,8 +1,6 @@
 package com.spring.spring_booking_system.configs;
 
-import com.spring.spring_booking_system.entities.Role;
-import com.spring.spring_booking_system.entities.Space;
-import com.spring.spring_booking_system.entities.User;
+import com.spring.spring_booking_system.entities.*;
 import com.spring.spring_booking_system.repositories.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -37,6 +35,7 @@ public class DataSeeding implements CommandLineRunner {
         seedRoles();
         seedSpaces();
         seedUsers();
+        seedProgramsAndSubjects();
     }
 
     public void seedRoles() {
@@ -85,7 +84,38 @@ public class DataSeeding implements CommandLineRunner {
     }
 
     public void seedProgramsAndSubjects() {
-        
+        // Add programs (ITS and ISC)
+        if (programRepository.count() == 0) {
+            List<Program> programs = List.of(
+                    createProgram("ITS"),
+                    createProgram("ISC")
+            );
+
+            programRepository.saveAll(programs);
+        }
+
+        if (subjectRepository.count() == 0) {
+            List<Subject> subjects = List.of(
+                    createSubject("Programación web", programRepository.findByName("ITS")),
+                    createSubject("Desarrollo de aplicaciones móviles", programRepository.findByName("ITS")),
+                    createSubject("Redes de computadoras", programRepository.findByName("ISC"))
+                    );
+
+            subjectRepository.saveAll(subjects);
+        }
+    }
+
+    private Subject createSubject(String name, Program program) {
+        Subject subject = new Subject();
+        subject.setName(name);
+        subject.setProgram(program);
+        return subject;
+    }
+
+    private Program createProgram(String name) {
+        Program program = new Program();
+        program.setName(name);
+        return program;
     }
 
     private Space createSpace(String name, String description, int capacity) {
