@@ -11,4 +11,5 @@ import java.util.Optional;
 public interface SubjectRepository extends JpaRepository<Subject, Long> {
 
     List<Subject> findByProgramId(Long programId);
+    Subject findByName(String name);
 }
