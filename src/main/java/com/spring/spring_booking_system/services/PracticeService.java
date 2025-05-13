@@ -16,6 +16,10 @@ public class PracticeService {
         this.practiceRepository = practiceRepository;
     }
 
+    public Optional<Practice> findByPracticeId(Long practiceId) {
+        return practiceRepository.findById(practiceId);
+    }
+
     public List<Practice> getAllPractices() {
         return practiceRepository.findAll();
     }

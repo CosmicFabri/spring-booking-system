@@ -1,8 +1,11 @@
 package com.spring.spring_booking_system.services;
 
 import com.spring.spring_booking_system.entities.FileData;
+import com.spring.spring_booking_system.entities.Practice;
 import com.spring.spring_booking_system.repositories.FileDataRepository;
+import com.spring.spring_booking_system.repositories.PracticeRepository;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,25 +17,37 @@ import java.util.Optional;
 @Service
 public class FileStorageService {
     private final FileDataRepository fileDataRepository;
+    private final PracticeService practiceService;
+    private final PracticeRepository practiceRepository;
 
     @Value("${file.upload-dir}")
     private String FOLDER_PATH;
 
-    public FileStorageService(FileDataRepository fileDataRepository) {
+    public FileStorageService(FileDataRepository fileDataRepository, PracticeService practiceService, PracticeRepository practiceRepository) {
         this.fileDataRepository = fileDataRepository;
+        this.practiceService = practiceService;
+        this.practiceRepository = practiceRepository;
     }
 
-    public String uploadFile(MultipartFile file) throws IOException {
-        String filePath = FOLDER_PATH + file.getOriginalFilename();
+    public String uploadFile(MultipartFile file, Long practiceId) throws IOException {
+        Practice practice = practiceService.findByPracticeId(practiceId).orElse(null);
+        if (practice == null) {
+            throw new IOException("Practice not found");
+        }
+
+        String name = practiceId.toString() + practice.getName().replaceAll("\\s+", "");
+        String filePath = FOLDER_PATH + name;
 
         FileData fileData = fileDataRepository.save(FileData.builder()
-                .name(file.getOriginalFilename())
+                .name(name)
                 .type(file.getContentType())
                 .path(filePath)
                 .build()
         );
 
         file.transferTo(new File(filePath));
+        practice.setFile(fileData);
+        practiceRepository.save(practice);
 
         if(fileData.getId() != null) {
             return "File uploaded successfully";

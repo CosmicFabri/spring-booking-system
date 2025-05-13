@@ -22,13 +22,13 @@ public class FileStorageController {
     }
 
     @PostMapping
-    public ResponseEntity<?> uploadFile(@RequestParam("file") MultipartFile file) throws IOException {
-        String uploadFile = fileStorageService.uploadFile(file);
+    public ResponseEntity<?> uploadFile(@RequestParam("file") MultipartFile file, @RequestParam Long practiceId) throws IOException {
+        String uploadFile = fileStorageService.uploadFile(file, practiceId);
         return ResponseEntity.ok().body(uploadFile);
     }
 
-    @GetMapping("/fileName")
-    public ResponseEntity<?> downloadFile(@RequestParam("fileName") String fileName) throws IOException {
+    @GetMapping("/{fileName}")
+    public ResponseEntity<?> downloadFile(@PathVariable("fileName") String fileName) throws IOException {
         byte[] fileBytes = fileStorageService.downloadFile(fileName);
         return ResponseEntity.ok()
                 .contentType(MediaType.valueOf("application/pdf"))

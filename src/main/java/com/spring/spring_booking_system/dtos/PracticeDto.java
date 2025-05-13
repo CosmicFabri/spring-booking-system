@@ -19,8 +19,8 @@ public class PracticeDto {
     @NotBlank
     private Long subjectId;
 
-    @JsonProperty("file_path")
-    private String filePath;
+    @JsonProperty("file_name")
+    private String fileName;
 
     public PracticeDto(Practice practice) {
         this.id = practice.getId();
@@ -29,9 +29,9 @@ public class PracticeDto {
 
         FileData fileData = practice.getFile();
         if(fileData != null) {
-            this.filePath = fileData.getPath();
+            this.fileName = fileData.getName();
         } else {
-            this.filePath = null;
+            this.fileName = null;
         }
     }
 }
