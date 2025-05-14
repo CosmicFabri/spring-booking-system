@@ -29,10 +29,31 @@ public class FileStorageService {
         this.practiceRepository = practiceRepository;
     }
 
+    public String deleteFIle(String fileName) {
+        // TODO: Include Exceptions
+
+        FileData fileData = fileDataRepository.findByName(fileName)
+                .orElseThrow(() -> new RuntimeException("File not found in DB"));
+
+        Practice practice = practiceRepository.findByFile(fileData)
+                .orElseThrow(() -> new RuntimeException("File not found in DB"));
+
+        File file = new File(fileData.getPath());
+        try {
+            file.delete();
+        } catch (Exception e) {
+            // Throw Exception
+        }
+
+        practice.setFile(null);
+        practiceRepository.save(practice);
+        return fileName + " Deleted";
+    }
+
     public String uploadFile(MultipartFile file, Long practiceId) throws IOException {
         Practice practice = practiceService.findByPracticeId(practiceId).orElse(null);
         if (practice == null) {
-            throw new IOException("Practice not found");
+            throw new IOException("Practice not found"); // Temporal exception until I made the good one
         }
 
         String name = practiceId.toString() + practice.getName().replaceAll("\\s+", "");
